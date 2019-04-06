@@ -13,9 +13,11 @@ class JFnet(Model):
 
     WEIGHTS_PATH = "models/keras_JFnet.h5"
 
-    def __init__(self, width=512, height=512):
+    def __init__(self, width=512, height=512, **kwargs):
         network = JFnet.build_model(width=width, height=height,
-                                    filename=JFnet.WEIGHTS_PATH)
+                                    filename=JFnet.WEIGHTS_PATH,
+                                    **kwargs
+                                    )
         super(JFnet, self).__init__(net=network)
 
     @staticmethod
@@ -40,6 +42,10 @@ class JFnet(Model):
             Keras model with pretrained weights
         Notes
         -----
+            Two layers are named:
+            last convolutional layer is "last_conv"
+            and 7th (layer 17 in lasagne) convolutional is "layer_17"
+
             Reference: Jeffrey De Fauw, 2015:
             http://jeffreydf.github.io/diabetic-retinopathy-detection/
             Download pretrained weights from:
@@ -144,7 +150,9 @@ class JFnet(Model):
         conv_bias_9 = Bias()(conv_main_9)
         conv_activation_9 = LeakyReLU(alpha=0.5)(conv_bias_9)
         dropout_9 = Dropout(p_conv)(conv_activation_9)
-        maxpool_9 = MaxPool2D(pool_size=3, strides=(2, 2))(dropout_9)
+        maxpool_9 = MaxPool2D(
+            pool_size=3, name="layer_13",
+            strides=(2, 2))(dropout_9)
         # 14
         conv_main_10 = Conv2D(
             256, 3, strides=(1, 1), padding='same',
@@ -187,10 +195,11 @@ class JFnet(Model):
             )(dropout_13)
         # 19, special dropout between phases with p=1/2
         dropout_inter = Dropout(0.5)(maxpool_13)
+        flatten_inter = Flatten()(dropout_inter)
         # 20 Dense phase
         # Maxout layer is implemented here as Dense+custom feature_pool
         maxout_1 = Dense(units=1024,
-                         activation=None,)(Flatten()(dropout_inter))
+                         activation=None,)(flatten_inter)
         # need to wrap operation in Lambda to count as a layer
         maxout_2 = Lambda(
             lambda x: feature_pool_max(x, pool_size=2, axis=1)
@@ -205,7 +214,9 @@ class JFnet(Model):
         # that's capable of changing batch_size as well
         # expect order left-right
         # TODO: (-1, net['23'].output_shape[1] * 2)
-        flatten = Lambda(lambda x: tf.reshape(x, (batch_size//2, concat.shape[1]*2)))(concat)
+        flatten = Lambda(
+            lambda x: tf.reshape(x, (-1, concat.shape[1]*2))
+        )(concat)
         dense_droupout_0 = Dropout(0.5)(flatten)
         # 26
         dense_1 = Dense(units=1024,
@@ -293,5 +304,11 @@ if __name__ == "__main__":
     model = JFnet.build_model()
     print(model.summary())
     """
-    model = JFnet.build_model()
-    print(model.summary())
+    jfnet = JFnet(batch_size=2)
+    jfnet.print_summary()
+    model = jfnet.net
+    input = [np.zeros(model.input_shape[0]), np.zeros(model.input_shape[1])]
+    print("-" * 10 + "Predict" + "-" * 10)
+    print(jfnet.predict(input))
+    print("-" * 10 + "MC samples" + "-" * 10)
+    print(jfnet.mc_samples(input, n_inputs=2))
