@@ -1,13 +1,15 @@
 import numpy as np
 import tensorflow as tf
+
+from Model import Model
+
 from tensorflow import keras
-from tensorflow.keras import Model
 from tensorflow.keras.layers import Conv2D, Dropout, Dense, MaxPool2D
 from tensorflow.keras.layers import Input, LeakyReLU, Softmax, Reshape, Flatten
 from tensorflow.keras.layers import concatenate, Lambda, Layer
 
 
-class JFnet(tf.keras.Model):
+class JFnet(Model):
 
     WEIGHTS_PATH = "models/keras_JFnet.h5"
 
@@ -179,11 +181,14 @@ class JFnet(tf.keras.Model):
         conv_bias_13 = Bias()(conv_main_13)
         conv_activation_13 = LeakyReLU(alpha=0.5)(conv_bias_13)
         dropout_13 = Dropout(p_conv)(conv_activation_13)
-        maxpool_13 = MaxPool2D(pool_size=3, strides=(2, 2))(dropout_13)
+        maxpool_13 = MaxPool2D(
+            pool_size=3, strides=(2, 2),
+            name="last_conv",
+            )(dropout_13)
         # 19, special dropout between phases with p=1/2
         dropout_inter = Dropout(0.5)(maxpool_13)
         # 20 Dense phase
-        # Maxout layer is implemented here as Dense+custom feature_pool function
+        # Maxout layer is implemented here as Dense+custom feature_pool
         maxout_1 = Dense(units=1024,
                          activation=None,)(Flatten()(dropout_inter))
         # need to wrap operation in Lambda to count as a layer
@@ -196,7 +201,7 @@ class JFnet(tf.keras.Model):
         concat = concatenate([maxout_2, img_dim_input], axis=1)
 
         # 24
-        # use lambda for custom reshape 
+        # use lambda for custom reshape
         # that's capable of changing batch_size as well
         # expect order left-right
         # TODO: (-1, net['23'].output_shape[1] * 2)
@@ -206,7 +211,9 @@ class JFnet(tf.keras.Model):
         dense_1 = Dense(units=1024,
                         activation=None,
                         )(dense_droupout_0)
-        dense_maxpool_1 = Lambda(lambda x: feature_pool_max(x, pool_size=2, axis=1))(dense_1)
+        dense_maxpool_1 = Lambda(
+            lambda x: feature_pool_max(x, pool_size=2, axis=1)
+            )(dense_1)
         dense_dropout_1 = Dropout(0.5)(dense_maxpool_1)
 
         # 29
@@ -286,5 +293,5 @@ if __name__ == "__main__":
     model = JFnet.build_model()
     print(model.summary())
     """
-    model = JFnet()
-    print(model)
+    model = JFnet.build_model()
+    print(model.summary())

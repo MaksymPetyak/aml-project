@@ -1,5 +1,9 @@
 import numpy as np
 import tensorflow as tf
+
+from Model import Model
+from JFnet import JFnet
+
 from tensorflow import keras
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Conv2D, Dropout, Dense, MaxPool2D, GlobalAveragePooling2D,GlobalMaxPooling2D
@@ -58,116 +62,20 @@ def BCNN_model(width=512, height=512, filename=None,
     """
 
     """
-    main_input = Input(
-        shape=(height, width, 3),
-        batch_size=batch_size,
-    )
+    jf_model = JFnet.build_model()
+    conv_output = jf_model.get_layer("last_conv").output
 
-    # Note: for conv layers paper uses untie_biases=True
-    # layer will have separate bias parameters for entire output
-    # As a result, the bias is a 3D tensor.
-    # Implemented as a Bias layer
-
-    # no need to init weights as they will be loaded from a file
-    # Conv layers(filters, kernel_size)
-    conv_main_1 = Conv2D(
-        32, 7, strides=(2, 2), padding='same',
-        use_bias=False,
-        activation=None,
-    )(main_input)
-    conv_bias_1 = Bias()(conv_main_1)
-    conv_activation_1 = LeakyReLU(alpha=0.5)(conv_bias_1)
-    dropout_1 = Dropout(p_conv)(conv_activation_1)
-    maxpool_1 = MaxPool2D(pool_size=3, strides=(2, 2))(dropout_1)
-    # 3
-    conv_main_2 = Conv2D(
-        32, 3, strides=(1, 1), padding='same',
-        use_bias=False,
-        activation=None,
-    )(maxpool_1)
-    conv_bias_2 = Bias()(conv_main_2)
-    conv_activation_2 = LeakyReLU(alpha=0.5)(conv_bias_2)
-    dropout_2 = Dropout(p_conv)(conv_activation_2)
-    # 4
-    conv_main_3 = Conv2D(
-        32, 3, strides=(1, 1), padding='same',
-        use_bias=False,
-        activation=None,
-    )(dropout_2)
-    conv_bias_3 = Bias()(conv_main_3)
-    conv_activation_3 = LeakyReLU(alpha=0.5)(conv_bias_3)
-    dropout_3 = Dropout(p_conv)(conv_activation_3)
-    maxpool_3 = MaxPool2D(pool_size=3, strides=(2, 2))(dropout_3)
-    # 6
-    conv_main_4 = Conv2D(
-        64, 3, strides=(1, 1), padding='same',
-        use_bias=False,
-        activation=None,
-    )(maxpool_3)
-    conv_bias_4 = Bias()(conv_main_4)
-    conv_activation_4 = LeakyReLU(alpha=0.5)(conv_bias_4)
-    dropout_4 = Dropout(p_conv)(conv_activation_4)
-    # 7
-    conv_main_5 = Conv2D(
-        64, 3, strides=(1, 1), padding='same',
-        use_bias=False,
-        activation=None,
-    )(dropout_4)
-    conv_bias_5 = Bias()(conv_main_5)
-    conv_activation_5 = LeakyReLU(alpha=0.5)(conv_bias_5)
-    dropout_5 = Dropout(p_conv)(conv_activation_5)
-    maxpool_5 = MaxPool2D(pool_size=3, strides=(2, 2))(dropout_5)
-    # 9
-    conv_main_6 = Conv2D(
-        128, 3, strides=(1, 1), padding='same',
-        use_bias=False,
-        activation=None,
-    )(maxpool_5)
-    conv_bias_6 = Bias()(conv_main_6)
-    conv_activation_6 = LeakyReLU(alpha=0.5)(conv_bias_6)
-    dropout_6 = Dropout(p_conv)(conv_activation_6)
-    # 10
-    conv_main_7 = Conv2D(
-        128, 3, strides=(1, 1), padding='same',
-        use_bias=False,
-        activation=None,
-    )(dropout_6)
-    conv_bias_7 = Bias()(conv_main_7)
-    conv_activation_7 = LeakyReLU(alpha=0.5)(conv_bias_7)
-    dropout_7 = Dropout(p_conv)(conv_activation_7)
-    # 11
-    conv_main_8 = Conv2D(
-        128, 3, strides=(1, 1), padding='same',
-        use_bias=False,
-        activation=None,
-    )(dropout_7)
-    conv_bias_8 = Bias()(conv_main_8)
-    conv_activation_8 = LeakyReLU(alpha=0.5)(conv_bias_8)
-    dropout_8 = Dropout(p_conv)(conv_activation_8)
-    # 12
-    conv_main_9 = Conv2D(
-        128, 3, strides=(1, 1), padding='same',
-        use_bias=False,
-        activation=None,
-    )(dropout_8)
-    conv_bias_9 = Bias()(conv_main_9)
-    conv_activation_9 = LeakyReLU(alpha=0.5)(conv_bias_9)
-    dropout_9 = Dropout(p_conv)(conv_activation_9)
-    maxpool_9 = MaxPool2D(pool_size=3, strides=(2, 2))(dropout_9)
-    # layer 13
-
-    # ------------------BCNN-Specialized-part-----------------------
     mean_pooled = GlobalAveragePooling2D(
-        data_format='channels_last')(maxpool_9)
+        data_format='channels_last')(conv_output)
     max_pooled = GlobalMaxPooling2D(
-        data_format='channels_last')(maxpool_9)
+        data_format='channels_last')(conv_output)
     global_pool = concatenate([mean_pooled, max_pooled], axis=1)
 
     softmax_input = Dense(
         units=n_classes, activation=None,)(global_pool)
     softmax_output = Softmax()(softmax_input)
 
-    model = Model(inputs=[main_input], outputs=[softmax_output])
+    model = Model(inputs=[jf_model.input[0]], outputs=[softmax_output])
 
     return model
 
