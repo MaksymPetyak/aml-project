@@ -8,8 +8,8 @@ def main(source_dir, target_dir):
     source_filenames.sort()
     target_filenames.sort()
     ok = True
-    print('Source count: ' + len(source_filenames))
-    print('Target count: ' + len(target_filenames))
+    print('Source count: ' + str(len(source_filenames)))
+    print('Target count: ' + str(len(target_filenames)))
     if len(source_filenames) != len(target_filenames):
         print('Sizes mismatch...')
         ok = False
