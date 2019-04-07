@@ -6,6 +6,8 @@ from PIL import Image
 import numpy as np
 import cv2
 
+from fs_utils import collect_images, ensure_directory_exists
+
 # The amount of concurrency available. This should not be set
 # higher than the number of hardware threads available on the
 # machine, minus 1.
@@ -49,9 +51,6 @@ def set_readonly_directories(source, target):
     readonly_source_directory = source
     readonly_target_directory = target
 
-def is_image_filename(filename):
-    return filename.lower().split('.')[-1] in ['jpg', 'jpeg', 'tif', 'png']
-
 # Given a filename, this will build a path for the file in our
 # target directory and assign the correct extension.
 def build_image_target_path(filename):
@@ -68,25 +67,10 @@ def process_image(source_image):
         if img is not None:
             img.save(target_path, quality=97)
 
-def ensure_directory_exists(directory):
-    try:
-        os.mkdir(directory)
-    except OSError:
-        pass
-
-# This function will construct a list of image
-# (filepath, filename) pairs from a given directory.
-def collect_source_images(directory):
-    source_images = []
-    for directory_prefix, _, filenames in os.walk(directory):
-        image_filenames = [filename for filename in filenames if is_image_filename(filename)]
-        source_images.extend([(os.path.join(directory_prefix, f), f) for f in image_filenames])
-    return source_images
-
 # Entry point.
 def main():
     ensure_directory_exists(readonly_target_directory)
-    source_images = collect_source_images(readonly_source_directory)
+    source_images = collect_images(readonly_source_directory)
     if not source_images:
         print('Nothing to process.')
         exit()
