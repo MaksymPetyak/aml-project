@@ -8,10 +8,10 @@ def main(source_dir, target_dir):
     source_filenames.sort()
     target_filenames.sort()
     ok = True
+    print('Source count: ' + len(source_filenames))
+    print('Target count: ' + len(target_filenames))
     if len(source_filenames) != len(target_filenames):
         print('Sizes mismatch...')
-        print('Source count: ' + len(source_filenames))
-        print('Target count: ' + len(target_filenames))
         ok = False
     for sfname, tfname in zip(source_filenames, target_filenames):
         if sfname != tfname:
