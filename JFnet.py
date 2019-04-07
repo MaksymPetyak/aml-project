@@ -42,10 +42,6 @@ class JFnet(Model):
             Keras model with pretrained weights
         Notes
         -----
-            Two layers are named:
-            last convolutional layer is "last_conv"
-            and 7th (layer 17 in lasagne) convolutional is "layer_17"
-
             Reference: Jeffrey De Fauw, 2015:
             http://jeffreydf.github.io/diabetic-retinopathy-detection/
             Download pretrained weights from:
@@ -187,7 +183,7 @@ class JFnet(Model):
             activation=None,
         )(dropout_12)
         conv_bias_13 = Bias()(conv_main_13)
-        conv_activation_13 = LeakyReLU(alpha=0.5)(conv_bias_13)
+        conv_activation_13 = LeakyReLU(alpha=0.5, name="layer_17")(conv_bias_13)
         dropout_13 = Dropout(p_conv)(conv_activation_13)
         maxpool_13 = MaxPool2D(
             pool_size=3, strides=(2, 2),

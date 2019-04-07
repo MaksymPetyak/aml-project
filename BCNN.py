@@ -11,16 +11,24 @@ import pickle
 
 
 class BCNN(Model):
-    """Bayesian convolutional neural network (if p != 0 and on at test time)"""
+    """Bayesian convolutional neural network (if p != 0 and on at test time)
+    Save weights are for last_layer='17', but default was 13
+    Weights:
+    models/weights_bcnn1_392bea6.h5
+    models/weights_bcnn2_b69aadd.h5
+    """
 
-    def __init__(self, p_conv=0.2, last_layer='13', weights=None,
+    def __init__(self, p_conv=0.2, last_layer="layer_17", weights=None,
                  n_classes=2, **kwargs):
+        """
+        weights - path to the weight .h5 file
+        """
         jf_model = JFnet.build_model(
             width=512, height=512,
             filename=JFnet.WEIGHTS_PATH,
             p_conv=p_conv, **kwargs)
         # remove unused layers
-        conv_output = jf_model.get_layer("last_conv").output
+        conv_output = jf_model.get_layer(last_layer).output
 
         mean_pooled = GlobalAveragePooling2D(
             data_format='channels_last')(conv_output)
@@ -36,38 +44,15 @@ class BCNN(Model):
             inputs=[jf_model.input[0]],
             outputs=[softmax_output])
 
-        # TODO: implement saving weights
         if weights is not None:
-            pass
+            model.load_weights(weights)
 
         super(BCNN, self).__init__(net=model)
 
 
-def BCNN_model(width=512, height=512, filename=None,
-               n_classes=2, batch_size=64, p_conv=0.0,):
-    """
-
-    """
-    jf_model = JFnet.build_model()
-    conv_output = jf_model.get_layer("last_conv").output
-
-    mean_pooled = GlobalAveragePooling2D(
-        data_format='channels_last')(conv_output)
-    max_pooled = GlobalMaxPooling2D(
-        data_format='channels_last')(conv_output)
-    global_pool = concatenate([mean_pooled, max_pooled], axis=1)
-
-    softmax_input = Dense(
-        units=n_classes, activation=None,)(global_pool)
-    softmax_output = Softmax()(softmax_input)
-
-    model = Model(inputs=[jf_model.input[0]], outputs=[softmax_output])
-
-    return model
-
 # testing with main
 if __name__ == "__main__":
-    bcnn = BCNN(batch_size=2)
+    bcnn = BCNN(weights="models/weights_bcnn1_392bea6.h5", batch_size=2,)
     bcnn.print_summary()
     model = bcnn.net
     input = np.zeros(model.input_shape)
