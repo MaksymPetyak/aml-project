@@ -9,7 +9,7 @@ import cv2
 # The amount of concurrency available. This should not be set
 # higher than the number of hardware threads available on the
 # machine, minus 1.
-THREAD_COUNT = 3
+THREAD_COUNT = 5
 # The amount of images in a single batch. We divide the images
 # into batches and assign those batches to different threads.
 BATCH_SIZE = 500
