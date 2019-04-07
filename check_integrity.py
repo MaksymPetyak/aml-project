@@ -1,4 +1,5 @@
 
+import sys
 from fs_utils import collect_images
 
 def main(source_dir, target_dir):

@@ -1,4 +1,6 @@
 
+import os
+
 def ensure_directory_exists(directory):
     try:
         os.mkdir(directory)
