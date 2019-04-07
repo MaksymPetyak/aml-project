@@ -52,10 +52,12 @@ class BCNN(Model):
 
 # testing with main
 if __name__ == "__main__":
-    bcnn = BCNN(weights="models/weights_bcnn1_392bea6.h5", batch_size=2,)
+    # avoid using batchsize with BCNN
+    bcnn = BCNN(weights="models/weights_bcnn1_392bea6.h5")
     bcnn.print_summary()
     model = bcnn.net
-    input = np.zeros(model.input_shape)
+    input = np.zeros(model.input_shape[1:])
+    input = input.reshape((-1,) + model.input_shape[1:])
     print("-" * 10 + "Predict" + "-" * 10)
     print(bcnn.predict(input))
     print("-" * 10 + "MC samples" + "-" * 10)

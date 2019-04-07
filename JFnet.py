@@ -22,32 +22,10 @@ class JFnet(Model):
 
     @staticmethod
     def build_model(width=512, height=512, filename=None,
-                    n_classes=5, batch_size=64, p_conv=0.0):
+                    n_classes=5, batch_size=None, p_conv=0.0):
         """
-        Parameters
-        ----------
-        width : Optional[int]
-            image width
-        height : Optional[int]
-            image height
-        filename : Optional[str]
-            if filename is not None, weights are loaded from filename
-        n_classes : Optional[int]
-            default 5 for transfer learning on Kaggle DR data
-        batch_size : should only be set if all batches have the same size!
-        p_conv: dropout applied to conv. layers, by default turned off (0.0)
-        Returns
-        -------
-        Model
-            Keras model with pretrained weights
-        Notes
-        -----
-            Reference: Jeffrey De Fauw, 2015:
-            http://jeffreydf.github.io/diabetic-retinopathy-detection/
-            Download pretrained weights from:
-            https://github.com/JeffreyDF/kaggle_diabetic_retinopathy/blob/
-            master/dumps/2015_07_17_123003_PARAMSDUMP.pkl
-           original net has leaky rectifier units
+        Provide batch size for JFNET
+        Keep it None for BCNN, easier to deal with inputs
         """
         # Input shape (height, width, depth)
         # different from original implimentation!
@@ -227,7 +205,7 @@ class JFnet(Model):
         dense_2 = Dense(units=n_classes*2,
                         activation=None,)(dense_dropout_1)
         softmax_flatten = Lambda(
-            lambda x: tf.reshape(x, (batch_size, n_classes))
+            lambda x: tf.reshape(x, (-1, n_classes))
             )(dense_2)
         softmax = Softmax()(softmax_flatten)
 
@@ -300,7 +278,8 @@ if __name__ == "__main__":
     model = JFnet.build_model()
     print(model.summary())
     """
-    jfnet = JFnet(batch_size=2)
+    # Use batchsize with JFNET
+    jfnet = JFnet(batch_size=64)
     jfnet.print_summary()
     model = jfnet.net
     input = [np.zeros(model.input_shape[0]), np.zeros(model.input_shape[1])]
