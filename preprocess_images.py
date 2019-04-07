@@ -62,11 +62,6 @@ def build_image_target_path(filename):
 # a processed image to our target directory.
 def process_image(source_image):
     source_path, source_filename = source_image[0], source_image[1]
-    print('process_image:')
-    print('   source_path = {}'.format(source_path))
-    print('   source_filename = {}'.format(source_filename))
-    print('   readonly_source_directory: ' + readonly_source_directory)
-    print('   readonly_target_directory: ' + readonly_target_directory)
     target_path = build_image_target_path(source_filename)
     if not os.path.exists(target_path):
         img = convert(source_path, CROP_SIZE)
