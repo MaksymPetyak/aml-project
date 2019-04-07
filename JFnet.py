@@ -48,7 +48,7 @@ class JFnet(Model):
         )(main_input)
         conv_bias_1 = Bias()(conv_main_1)
         conv_activation_1 = LeakyReLU(alpha=0.5)(conv_bias_1)
-        dropout_1 = Dropout(p_conv)(conv_activation_1)
+        dropout_1 = Dropout(rate=p_conv)(conv_activation_1)
         maxpool_1 = MaxPool2D(pool_size=3, strides=(2, 2))(dropout_1)
         # 3
         conv_main_2 = Conv2D(
@@ -58,7 +58,7 @@ class JFnet(Model):
         )(maxpool_1)
         conv_bias_2 = Bias()(conv_main_2)
         conv_activation_2 = LeakyReLU(alpha=0.5)(conv_bias_2)
-        dropout_2 = Dropout(p_conv)(conv_activation_2)
+        dropout_2 = Dropout(rate=p_conv)(conv_activation_2)
         # 4
         conv_main_3 = Conv2D(
             32, 3, strides=(1, 1), padding='same',
@@ -67,7 +67,7 @@ class JFnet(Model):
         )(dropout_2)
         conv_bias_3 = Bias()(conv_main_3)
         conv_activation_3 = LeakyReLU(alpha=0.5)(conv_bias_3)
-        dropout_3 = Dropout(p_conv)(conv_activation_3)
+        dropout_3 = Dropout(rate=p_conv)(conv_activation_3)
         maxpool_3 = MaxPool2D(pool_size=3, strides=(2, 2))(dropout_3)
         # 6
         conv_main_4 = Conv2D(
@@ -77,7 +77,7 @@ class JFnet(Model):
         )(maxpool_3)
         conv_bias_4 = Bias()(conv_main_4)
         conv_activation_4 = LeakyReLU(alpha=0.5)(conv_bias_4)
-        dropout_4 = Dropout(p_conv)(conv_activation_4)
+        dropout_4 = Dropout(rate=p_conv)(conv_activation_4)
         # 7
         conv_main_5 = Conv2D(
             64, 3, strides=(1, 1), padding='same',
@@ -86,7 +86,7 @@ class JFnet(Model):
         )(dropout_4)
         conv_bias_5 = Bias()(conv_main_5)
         conv_activation_5 = LeakyReLU(alpha=0.5)(conv_bias_5)
-        dropout_5 = Dropout(p_conv)(conv_activation_5)
+        dropout_5 = Dropout(rate=p_conv)(conv_activation_5)
         maxpool_5 = MaxPool2D(pool_size=3, strides=(2, 2))(dropout_5)
         # 9
         conv_main_6 = Conv2D(
@@ -96,7 +96,7 @@ class JFnet(Model):
         )(maxpool_5)
         conv_bias_6 = Bias()(conv_main_6)
         conv_activation_6 = LeakyReLU(alpha=0.5)(conv_bias_6)
-        dropout_6 = Dropout(p_conv)(conv_activation_6)
+        dropout_6 = Dropout(rate=p_conv)(conv_activation_6)
         # 10
         conv_main_7 = Conv2D(
             128, 3, strides=(1, 1), padding='same',
@@ -105,7 +105,7 @@ class JFnet(Model):
         )(dropout_6)
         conv_bias_7 = Bias()(conv_main_7)
         conv_activation_7 = LeakyReLU(alpha=0.5)(conv_bias_7)
-        dropout_7 = Dropout(p_conv)(conv_activation_7)
+        dropout_7 = Dropout(rate=p_conv)(conv_activation_7)
         # 11
         conv_main_8 = Conv2D(
             128, 3, strides=(1, 1), padding='same',
@@ -114,7 +114,7 @@ class JFnet(Model):
         )(dropout_7)
         conv_bias_8 = Bias()(conv_main_8)
         conv_activation_8 = LeakyReLU(alpha=0.5)(conv_bias_8)
-        dropout_8 = Dropout(p_conv)(conv_activation_8)
+        dropout_8 = Dropout(rate=p_conv)(conv_activation_8)
         # 12
         conv_main_9 = Conv2D(
             128, 3, strides=(1, 1), padding='same',
@@ -123,7 +123,7 @@ class JFnet(Model):
         )(dropout_8)
         conv_bias_9 = Bias()(conv_main_9)
         conv_activation_9 = LeakyReLU(alpha=0.5)(conv_bias_9)
-        dropout_9 = Dropout(p_conv)(conv_activation_9)
+        dropout_9 = Dropout(rate=p_conv)(conv_activation_9)
         maxpool_9 = MaxPool2D(
             pool_size=3, name="layer_13",
             strides=(2, 2))(dropout_9)
@@ -135,7 +135,7 @@ class JFnet(Model):
         )(maxpool_9)
         conv_bias_10 = Bias()(conv_main_10)
         conv_activation_10 = LeakyReLU(alpha=0.5)(conv_bias_10)
-        dropout_10 = Dropout(p_conv)(conv_activation_10)
+        dropout_10 = Dropout(rate=p_conv)(conv_activation_10)
         # 15
         conv_main_11 = Conv2D(
             256, 3, strides=(1, 1), padding='same',
@@ -144,7 +144,7 @@ class JFnet(Model):
         )(dropout_10)
         conv_bias_11 = Bias()(conv_main_11)
         conv_activation_11 = LeakyReLU(alpha=0.5)(conv_bias_11)
-        dropout_11 = Dropout(p_conv)(conv_activation_11)
+        dropout_11 = Dropout(rate=p_conv)(conv_activation_11)
         # 16
         conv_main_12 = Conv2D(
             256, 3, strides=(1, 1), padding='same',
@@ -153,7 +153,7 @@ class JFnet(Model):
         )(dropout_11)
         conv_bias_12 = Bias()(conv_main_12)
         conv_activation_12 = LeakyReLU(alpha=0.5)(conv_bias_12)
-        dropout_12 = Dropout(p_conv)(conv_activation_12)
+        dropout_12 = Dropout(rate=p_conv)(conv_activation_12)
         # 17
         conv_main_13 = Conv2D(
             256, 3, strides=(1, 1), padding='same',
@@ -162,13 +162,13 @@ class JFnet(Model):
         )(dropout_12)
         conv_bias_13 = Bias()(conv_main_13)
         conv_activation_13 = LeakyReLU(alpha=0.5, name="layer_17")(conv_bias_13)
-        dropout_13 = Dropout(p_conv)(conv_activation_13)
+        dropout_13 = Dropout(rate=p_conv)(conv_activation_13)
         maxpool_13 = MaxPool2D(
             pool_size=3, strides=(2, 2),
             name="last_conv",
             )(dropout_13)
         # 19, special dropout between phases with p=1/2
-        dropout_inter = Dropout(0.5)(maxpool_13)
+        dropout_inter = Dropout(rate=0.5)(maxpool_13)
         flatten_inter = Flatten()(dropout_inter)
         # 20 Dense phase
         # Maxout layer is implemented here as Dense+custom feature_pool
@@ -191,15 +191,15 @@ class JFnet(Model):
         flatten = Lambda(
             lambda x: tf.reshape(x, (-1, concat.shape[1]*2))
         )(concat)
-        dense_droupout_0 = Dropout(0.5)(flatten)
+        dense_dropout_0 = Dropout(rate=0.5)(flatten)
         # 26
         dense_1 = Dense(units=1024,
                         activation=None,
-                        )(dense_droupout_0)
+                        )(dense_dropout_0)
         dense_maxpool_1 = Lambda(
             lambda x: feature_pool_max(x, pool_size=2, axis=1)
             )(dense_1)
-        dense_dropout_1 = Dropout(0.5)(dense_maxpool_1)
+        dense_dropout_1 = Dropout(rate=0.5)(dense_maxpool_1)
 
         # 29
         dense_2 = Dense(units=n_classes*2,
