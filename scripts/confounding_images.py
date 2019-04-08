@@ -1,4 +1,4 @@
-import cPickle as pickle
+import pickle
 import seaborn as sns
 import matplotlib.pyplot as plt
 
