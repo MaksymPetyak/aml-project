@@ -6,10 +6,10 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
-import keras
-from keras.layers import Input, Dense
-from keras.models import Model
-from keras.callbacks import EarlyStopping, ModelCheckpoint
+import tensorflow.keras as keras
+from tensorflow.keras.layers import Input, Dense
+from tensorflow.keras.models import Model
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 
 plt.ion()
 sns.set_context('paper', font_scale=1.5)
