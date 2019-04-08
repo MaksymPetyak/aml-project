@@ -75,10 +75,14 @@ train_datagen = ImageDataGenerator(**AUGMENTATION_PARAMS)
 def append_ext(f):
     return f + ".jpeg"
 
+
 labels = pd.read_csv(train_dir + "trainLabels.csv")
 labels['image'] = labels['image'].apply(append_ext)
-labels['level'] = labels['level'].astype(str)
 
+# for labels 1 vs 234
+labels = labels[labels.level != 0]
+labels['level'] = labels['level'].apply(lambda x: 1 if x > 1 else 0)
+labels['level'] = labels['level'].astype(str)
 
 # create dataset using folder directories
 # train feeds into augmenter
@@ -167,7 +171,7 @@ history = model.fit_generator(
     callbacks=callbacks,
     validation_data=validation_generator,
     workers=1,
-    use_multiprocessing=True
+    use_multiprocessing=False
 )
 
 pickle.dump(history, open('models/history_new_bcnn.pkl', 'wb'))
