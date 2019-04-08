@@ -113,7 +113,7 @@ def bayes_cross_entropy(y, ce_loss, n_classes):
     """Dalyac et al. (2014), eq. (17)"""
     # changed bincount to use numpy
     # need to shape to 1D from (len, 1)
-    tf.cast(y, dtype=tf.int32)
+    y = tf.cast(y, dtype=tf.int32)
     priors = tf.bincount(y) / y.shape[1]
     weights = 1.0 / (priors[y] * y.shape[1] * n_classes)
     bce_loss = ce_loss * weights
@@ -133,8 +133,8 @@ def bce_loss(n_classes):
 
 model.compile(
     tf.keras.optimizers.Adam(), #trying different optimizer!
-    loss=bce_loss(n_classes),
-    metrics=[auroc]
+    loss='categorical_crossentropy',
+    metrics=['acc', auroc]
 )
 
 # --------- Training Model ---------
