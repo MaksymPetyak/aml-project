@@ -11,7 +11,6 @@ from keras import backend as K
 import numpy as np
 import pandas as pd
 from PIL import Image
-import theano
 import sklearn.model_selection as ms
 
 
@@ -245,31 +244,18 @@ class KaggleDR(Dataset):
 
     @staticmethod
     def standard_normalize(image):
-        """Normalize image to have zero mean and unit variance.
-
-        Subtracts channel MEAN and divides by channel STD
-
-        Parameters
-        ----------
-        image : numpy array, shape = (n_colors, n_rows, n_columns), dtype =
-                                                           theano.config.floatX
-
-        Returns
-        -------
-        image : numpy array, shape = (n_colors, n_rows, n_columns), dtype =
-                                                           theano.config.floatX
         """
-
+        Normalize image to have zero mean and unit variance.
+        Subtracts channel MEAN and divides by channel STD
+        """
         # channel standard deviations (calculated by team o_O)
-        STD = np.array([70.53946096, 51.71475228, 43.03428563],
-                       dtype=theano.config.floatX)
+        STD = np.array([70.53946096, 51.71475228, 43.03428563])
         # channel means (calculated by team o_O)
-        MEAN = np.array([108.64628601, 75.86886597, 54.34005737],
-                        dtype=theano.config.floatX)
+        MEAN = np.array([108.64628601, 75.86886597, 54.34005737])
 
         return np.divide(np.subtract(image,
-                                     MEAN[:, np.newaxis, np.newaxis]),
-                         STD[:, np.newaxis, np.newaxis])
+                                     MEAN[np.newaxis, np.newaxis, :]),
+                         STD[np.newaxis, np.newaxis, :])
 
     @staticmethod
     def jf_trafo(image):
@@ -520,4 +506,3 @@ class DatasetIterator(object):
             return batch_x
         batch_y = self.dataset.y[index_array]
         return batch_x, batch_y
-
