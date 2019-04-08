@@ -7,7 +7,7 @@ from tensorflow import keras
 from tensorflow.keras.layers import Conv2D, Dropout, Dense, MaxPool2D
 from tensorflow.keras.layers import Input, LeakyReLU, Softmax, Reshape, Flatten
 from tensorflow.keras.layers import concatenate, Lambda, Layer
-
+from tensorflow.keras import regularizers
 
 class JFnet(Model):
 
@@ -22,10 +22,13 @@ class JFnet(Model):
 
     @staticmethod
     def build_model(width=512, height=512, filename=None,
-                    n_classes=5, batch_size=None, p_conv=0.0):
+                    n_classes=5, batch_size=None, p_conv=0.0,
+                    l2_lambda=0.001
+                    ):
         """
         Provide batch size for JFNET
         Keep it None for BCNN, easier to deal with inputs
+        Regularization type hardcoded (l2)
         """
         # Input shape (height, width, depth)
         # different from original implimentation!
@@ -45,6 +48,7 @@ class JFnet(Model):
             32, 7, strides=(2, 2), padding='same',
             use_bias=False,
             activation=None,
+            kernel_regularizer=regularizers.l2(l2_lambda),
         )(main_input)
         conv_bias_1 = Bias()(conv_main_1)
         conv_activation_1 = LeakyReLU(alpha=0.5)(conv_bias_1)
@@ -55,6 +59,7 @@ class JFnet(Model):
             32, 3, strides=(1, 1), padding='same',
             use_bias=False,
             activation=None,
+            kernel_regularizer=regularizers.l2(l2_lambda),
         )(maxpool_1)
         conv_bias_2 = Bias()(conv_main_2)
         conv_activation_2 = LeakyReLU(alpha=0.5)(conv_bias_2)
@@ -64,6 +69,7 @@ class JFnet(Model):
             32, 3, strides=(1, 1), padding='same',
             use_bias=False,
             activation=None,
+            kernel_regularizer=regularizers.l2(l2_lambda),
         )(dropout_2)
         conv_bias_3 = Bias()(conv_main_3)
         conv_activation_3 = LeakyReLU(alpha=0.5)(conv_bias_3)
@@ -74,6 +80,7 @@ class JFnet(Model):
             64, 3, strides=(1, 1), padding='same',
             use_bias=False,
             activation=None,
+            kernel_regularizer=regularizers.l2(l2_lambda),
         )(maxpool_3)
         conv_bias_4 = Bias()(conv_main_4)
         conv_activation_4 = LeakyReLU(alpha=0.5)(conv_bias_4)
@@ -83,6 +90,7 @@ class JFnet(Model):
             64, 3, strides=(1, 1), padding='same',
             use_bias=False,
             activation=None,
+            kernel_regularizer=regularizers.l2(l2_lambda),
         )(dropout_4)
         conv_bias_5 = Bias()(conv_main_5)
         conv_activation_5 = LeakyReLU(alpha=0.5)(conv_bias_5)
@@ -93,6 +101,7 @@ class JFnet(Model):
             128, 3, strides=(1, 1), padding='same',
             use_bias=False,
             activation=None,
+            kernel_regularizer=regularizers.l2(l2_lambda),
         )(maxpool_5)
         conv_bias_6 = Bias()(conv_main_6)
         conv_activation_6 = LeakyReLU(alpha=0.5)(conv_bias_6)
@@ -102,6 +111,7 @@ class JFnet(Model):
             128, 3, strides=(1, 1), padding='same',
             use_bias=False,
             activation=None,
+            kernel_regularizer=regularizers.l2(l2_lambda),
         )(dropout_6)
         conv_bias_7 = Bias()(conv_main_7)
         conv_activation_7 = LeakyReLU(alpha=0.5)(conv_bias_7)
@@ -111,6 +121,7 @@ class JFnet(Model):
             128, 3, strides=(1, 1), padding='same',
             use_bias=False,
             activation=None,
+            kernel_regularizer=regularizers.l2(l2_lambda),
         )(dropout_7)
         conv_bias_8 = Bias()(conv_main_8)
         conv_activation_8 = LeakyReLU(alpha=0.5)(conv_bias_8)
@@ -120,6 +131,7 @@ class JFnet(Model):
             128, 3, strides=(1, 1), padding='same',
             use_bias=False,
             activation=None,
+            kernel_regularizer=regularizers.l2(l2_lambda),
         )(dropout_8)
         conv_bias_9 = Bias()(conv_main_9)
         conv_activation_9 = LeakyReLU(alpha=0.5)(conv_bias_9)
@@ -132,6 +144,7 @@ class JFnet(Model):
             256, 3, strides=(1, 1), padding='same',
             use_bias=False,
             activation=None,
+            kernel_regularizer=regularizers.l2(l2_lambda),
         )(maxpool_9)
         conv_bias_10 = Bias()(conv_main_10)
         conv_activation_10 = LeakyReLU(alpha=0.5)(conv_bias_10)
@@ -141,6 +154,7 @@ class JFnet(Model):
             256, 3, strides=(1, 1), padding='same',
             use_bias=False,
             activation=None,
+            kernel_regularizer=regularizers.l2(l2_lambda),
         )(dropout_10)
         conv_bias_11 = Bias()(conv_main_11)
         conv_activation_11 = LeakyReLU(alpha=0.5)(conv_bias_11)
@@ -150,6 +164,7 @@ class JFnet(Model):
             256, 3, strides=(1, 1), padding='same',
             use_bias=False,
             activation=None,
+            kernel_regularizer=regularizers.l2(l2_lambda),
         )(dropout_11)
         conv_bias_12 = Bias()(conv_main_12)
         conv_activation_12 = LeakyReLU(alpha=0.5)(conv_bias_12)
@@ -159,10 +174,11 @@ class JFnet(Model):
             256, 3, strides=(1, 1), padding='same',
             use_bias=False,
             activation=None,
+            kernel_regularizer=regularizers.l2(l2_lambda),
         )(dropout_12)
         conv_bias_13 = Bias()(conv_main_13)
         conv_activation_13 = LeakyReLU(alpha=0.5, name="layer_17")(conv_bias_13)
-        dropout_13 = Dropout(rate=p_conv)(conv_activation_13)
+        dropout_13 = Dropout(rate=p_conv, name="layer_17d")(conv_activation_13)
         maxpool_13 = MaxPool2D(
             pool_size=3, strides=(2, 2),
             name="last_conv",
@@ -243,7 +259,7 @@ class Bias(Layer):
             shape=input_shape[1:],
             initializer='uniform',
             trainable=True)
-        super(Bias, self).build(input_shape)  # Be sure to call this at the end
+        super(Bias, self).build(input_shape)
 
     def call(self, x):
         return tf.add(x, self.bias)

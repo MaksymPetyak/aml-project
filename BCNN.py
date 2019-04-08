@@ -7,6 +7,7 @@ from JFnet import JFnet
 from tensorflow.keras.layers import Conv2D, Dropout, Dense, MaxPool2D, GlobalAveragePooling2D,GlobalMaxPooling2D
 from tensorflow.keras.layers import Input, LeakyReLU, Softmax, Reshape, Flatten
 from tensorflow.keras.layers import concatenate, maximum, Lambda, Layer
+from tensorflow.keras import regularizers
 import pickle
 
 
@@ -19,9 +20,10 @@ class BCNN(Model):
     """
 
     def __init__(self, p_conv=0.2, last_layer="layer_17", weights=None,
-                 n_classes=2, **kwargs):
+                 n_classes=2, l1_lambda=0.001, **kwargs):
         """
         weights - path to the weight .h5 file
+        Regularization type hardcoded (l1)
         """
         jf_model = JFnet.build_model(
             width=512, height=512,
@@ -37,7 +39,10 @@ class BCNN(Model):
         global_pool = concatenate([mean_pooled, max_pooled], axis=1)
 
         softmax_input = Dense(
-            units=n_classes, activation=None,)(global_pool)
+            units=n_classes,
+            activation=None,
+            kernel_regularizer=regularizers.l1(l1_lambda)
+            )(global_pool)
         softmax_output = Softmax()(softmax_input)
 
         model = tf.keras.Model(
