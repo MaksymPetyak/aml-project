@@ -14,9 +14,9 @@ import seaborn as sns
 from sklearn.metrics import roc_auc_score
 import statsmodels.nonparametric.api as smnp
 
-from util import roc_curve_plot
-from util import bootstrap
-from util import balance_classes
+from ..util import roc_curve_plot
+from ..util import bootstrap
+from ..util import balance_classes
 
 from matplotlib import rcParams
 rcParams.update({'figure.autolayout': True})
