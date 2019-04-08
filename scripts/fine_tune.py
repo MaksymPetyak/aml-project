@@ -1,6 +1,8 @@
+# Run from root directory
 import gc
 import pickle
 import numpy as np
+import pandas as pd
 
 import tensorflow as tf
 from tensorflow.keras import regularizers
@@ -12,17 +14,15 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
 
-import os
-os.sys.path.append('../')
+if __name__ == "__main__":
+    import os
+    os.sys.path.append('.')
 
 from BCNN import BCNN
 from datasets import KaggleDR
 from datasets import DatasetImageDataGenerator
 # from training import generator_queue
 # from util import Progplot
-
-# go back to the root directory
-os.chdir("../")
 
 # --------- Define parameters ---------
 p = 0.2
@@ -39,7 +39,7 @@ n_classes = 2
 dataset = 'KaggleDR'
 seed = 1234
 
-train_dir = "data/KaggleDR/train/"
+train_dir = "../../output/"
 test_dir = "data/KaggleDR/test/"
 
 previous_weights = None
@@ -71,10 +71,22 @@ AUGMENTATION_PARAMS = {'featurewise_center': False,
 
 train_datagen = ImageDataGenerator(**AUGMENTATION_PARAMS)
 
+# Loading
+def append_ext(f):
+    return f + ".jpeg"
+
+labels = pd.read_csv(train_dir + "trainLabels.csv")
+labels['image'] = labels['image'].apply(append_ext)
+labels['level'] = labels['level'].astype(str)
+
+
 # create dataset using folder directories
 # train feeds into augmenter
-train_generator = train_datagen.flow_from_directory(
+train_generator = train_datagen.flow_from_dataframe(
+    labels,
     directory=train_dir,
+    x_col='image',
+    y_col='level',
     target_size=(512, 512),
     batch_size=batch_size,
     shuffle=True,
@@ -84,8 +96,11 @@ train_generator = train_datagen.flow_from_directory(
 )
 
 # dataset for validation score
-validation_generator = train_datagen.flow_from_directory(
+validation_generator = train_datagen.flow_from_dataframe(
+    labels,
     directory=train_dir,
+    x_col='image',
+    y_col='level',
     target_size=(512, 512),
     batch_size=batch_size,
     shuffle=True,

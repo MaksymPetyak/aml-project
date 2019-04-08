@@ -5,9 +5,9 @@ import os
 import threading
 import warnings
 
-from keras.preprocessing.image import ImageDataGenerator
-from keras.preprocessing.image import img_to_array, array_to_img
-from keras import backend as K
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.preprocessing.image import img_to_array, array_to_img
+from tensorflow.keras import backend as K
 import numpy as np
 import pandas as pd
 from PIL import Image
