@@ -2,6 +2,7 @@
    affects the performance of the rest of the data that remains automatically
    classified"""
 from __future__ import print_function
+
 from collections import OrderedDict
 import h5py
 import matplotlib.pyplot as plt
@@ -14,8 +15,8 @@ import seaborn as sns
 from sklearn.metrics import roc_auc_score
 import statsmodels.nonparametric.api as smnp
 
-from ..util import roc_curve_plot
-from ..util import bootstrap
+from util import roc_curve_plot
+from util import bootstrap
 from ..util import balance_classes
 
 from matplotlib import rcParams
@@ -68,8 +69,8 @@ CONFIG = {
          ('dataset', 'Kaggle train'),
          ('predictions', 'data/processed/'
           '100_mc_KaggleDR_train_BayesJFnet17_392bea6.pkl'),
-         ('disease_onset', 1)] +
-        DATA['KaggleDR_train'].items()),
+         ('disease_onset', 1)] + list(
+        DATA['KaggleDR_train'].items())),
 
     'BCNN_mildDR_Kaggle': dict(
         [('net', 'BCNN'),
@@ -78,8 +79,8 @@ CONFIG = {
           '100_mc_KaggleDR_test_BayesJFnet17_392bea6.pkl'),
          ('predictions_gp', 'data/processed/'
           'GP/GPC_Results_MINIBATCH_KaggleDR_Onset1.mat'),
-         ('disease_onset', 1)] +
-        DATA['KaggleDR'].items()),
+         ('disease_onset', 1)] + list(
+        DATA['KaggleDR'].items())),
 
     'BCNN_moderateDR_Kaggle': dict(
         [('net', 'BCNN'),
@@ -88,24 +89,24 @@ CONFIG = {
           '100_mc_KaggleDR_test_bcnn2_b69aadd.pkl'),
          ('predictions_gp', 'data/processed/'
           'GP/GPC_Results_MINIBATCH_KaggleDR_Onset2.mat'),
-         ('disease_onset', 2)] +
-        DATA['KaggleDR'].items()),
+         ('disease_onset', 2)] + list(
+        DATA['KaggleDR'].items())),
 
     'JFnet_mildDR_Kaggle': dict(
         [('net', 'JFnet'),
          ('dataset', 'Kaggle'),
          ('predictions', 'data/processed/'
           'c9ade47_100_mc_KaggleDR_test_JFnet.pkl'),
-         ('disease_onset', 1)] +
-        DATA['KaggleDR'].items()),
+         ('disease_onset', 1)] + list(
+        DATA['KaggleDR'].items())),
 
     'JFnet_moderateDR_Kaggle': dict(
         [('net', 'JFnet'),
          ('dataset', 'Kaggle'),
          ('predictions', 'data/processed/'
           'c9ade47_100_mc_KaggleDR_test_JFnet.pkl'),
-         ('disease_onset', 2)] +
-        DATA['KaggleDR'].items()),
+         ('disease_onset', 2)] + list(
+        DATA['KaggleDR'].items())),
 
     'BCNN_mildDR_Messidor': dict(
         [('net', 'BCNN'),
@@ -114,8 +115,8 @@ CONFIG = {
           '100_mc_Messidor_BayesJFnet17_392bea6.pkl'),
          ('predictions_gp', 'data/processed/'
           'GP/GPC_Results_MINIBATCH_Messidor_Onset1.mat'),
-         ('disease_onset', 1)] +
-        DATA['Messidor'].items()),
+         ('disease_onset', 1)] +list(
+        DATA['Messidor'].items())),
 
     'BCNN_moderateDR_Messidor': dict(
         [('net', 'BCNN'),
@@ -124,8 +125,8 @@ CONFIG = {
           '100_mc_Messidor_BayesianJFnet17_onset2_b69aadd.pkl'),
          ('predictions_gp', 'data/processed/'
           'GP/GPC_Results_MINIBATCH_Messidor_Onset2.mat'),
-         ('disease_onset', 2)] +
-        DATA['Messidor'].items())
+         ('disease_onset', 2)] +list(
+        DATA['Messidor'].items()))
 }
 
 
