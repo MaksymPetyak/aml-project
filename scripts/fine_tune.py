@@ -29,7 +29,8 @@ from datasets import DatasetImageDataGenerator
 p = 0.2
 last_layer = 'layer_17d'  # from JFnet
 batch_size = 32
-epochs = 30
+epochs = 5
+train_model = False
 # lr_schedule = {0: 0.005, 1: 0.005, 2: 0.001, 3: 0.001, 4: 0.0005, 5: 0.0001}
 # change_every = 5
 # we don't apply regularization to bias
@@ -43,9 +44,12 @@ seed = 1234
 train_dir = "../../output/"
 test_dir = "../../output_test/"
 save_dir = "../training_output/"
+model_name = "new_bcnn"
 
-previous_weights = None
-
+# None to have new model, without pretraining
+# weights_path = save_dir + "new_bcnn.h5"
+# paper weights
+weights_path = "models/weights_bcnn1_392bea6.h5" 
 # --------- Dataset creation ---------
 # parameters for augmenting data
 # Currently need to specify preprocessing function manually
@@ -140,6 +144,7 @@ test_generator = test_datagen.flow_from_dataframe(
 # Setup networks
 bcnn = BCNN(p_conv=p, last_layer=last_layer, n_classes=n_classes,
             l1_lambda=l1_lambda, l2_lambda=l2_lambda,
+            weights=weights_path
            )
 model = bcnn.net
 
@@ -184,39 +189,47 @@ learning_rate_scheduler = LearningRateScheduler(
 
 callbacks = [
     learning_rate_scheduler,
-    ModelCheckpoint(save_dir + "new_bcnn.h5", 
+    ModelCheckpoint(save_dir + model_name + ".h5", 
                     monitor='val_loss', 
                     save_best_only=True, 
                     save_weights_only=True),
-    CSVLogger(save_dir + "new_bcnn_training.csv"),
+    CSVLogger(save_dir + model_name + "_training.csv"),
 ]
 
+if train_model:
+    history = model.fit_generator(
+        train_generator,
+	epochs=epochs,
+	verbose=1,
+	callbacks=callbacks,
+	validation_data=validation_generator,
+	workers=1,
+	use_multiprocessing=False
+    )
 
-history = model.fit_generator(
-    train_generator,
-    epochs=epochs,
-    verbose=1,
-    callbacks=callbacks,
-    validation_data=validation_generator,
-    workers=1,
-    use_multiprocessing=False
-)
-
-pickle.dump(history, open(save_dir + 'history_new_bcnn.pkl', 'wb'))
+    pickle.dump(history, open(save_dir + 'history_new_bcnn.pkl', 'wb'))
+    # load best weights
+    model.load_weights(save_dir + model_name + ".h5")
 
 # Calculate training roc_auc of best model
-model.load_weights(save_dir + "new_bcnn.h5")
-train_y_pred = model.predict_generator(
-    validation_generator
+train_y_pred = model.predict( #_generator(
+    validation_generator.next(),
+    verbose=1
 )
-train_y_true = validation_generator.classes
+# roc_auc takes prob of positive class as input
+train_y_pred = train_y_pred[:, 1]
+train_y_true = validation_generator.classes[:32]
 train_auc_score = roc_auc_score(train_y_true, train_y_pred)
+print(train_y_pred)
+print(train_y_true)
 print("AUC score {:.5f}".format(train_auc_score))
 
 # Calculate train accuracy and roc_auc
 test_y_pred = model.predict_generator(
-    test_generator
+    test_generator,
+    verbose=1
 )
+test_y_pred = test_y_pred[:, 1]
 test_y_true = test_generator.classes
 test_auc_score = roc_auc_score(test_y_true, test_y_pred)
 
