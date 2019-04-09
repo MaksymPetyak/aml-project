@@ -41,6 +41,7 @@ seed = 1234
 
 train_dir = "../../output/"
 test_dir = "data/KaggleDR/test/"
+save_dir = "../training_output/"
 
 previous_weights = None
 
@@ -159,8 +160,8 @@ model.compile(
 # --------- Training Model ---------
 # Callbacks for training
 callbacks = [
-    ModelCheckpoint("models/new_bcnn.h5", monitor='val_loss', save_best_only=True, save_weights_only=True),
-    CSVLogger("models/new_bccn_training.csv")
+    ModelCheckpoint(save_dir + "new_bcnn.h5", monitor='val_loss', save_best_only=True, save_weights_only=True),
+    CSVLogger(save_dir + "new_bccn_training.csv")
 ]
 
 
@@ -174,4 +175,4 @@ history = model.fit_generator(
     use_multiprocessing=False
 )
 
-pickle.dump(history, open('models/history_new_bcnn.pkl', 'wb'))
+pickle.dump(history, open(save_dir + 'history_new_bcnn.pkl', 'wb'))
