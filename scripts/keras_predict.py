@@ -5,7 +5,7 @@ import pandas as pd
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.utils.generic_utils import Progbar
+from tensorflow.keras.utils import Progbar
 
 
 from datasets import KaggleDR
@@ -25,18 +25,21 @@ normalization = None
 mc_samples = 100
 batch_size = 32
 n_classes = 2
-last_layer = "17d"
+last_layer = "layer_17d"
 
-weights_path = "../training_output/"
+weights_path = "../training_output/new_bcnn.h5"
 dataset_dir = "../../output_test" 
-labels_path = "../../trainLabel.csv"
-out_file = ""
+labels_path = "../../output_test/testLabels01vs234.csv"
+out_file = "../predict_output/mc_100_kaggledr_new_bcnn.pkl"
 
 # --------- Load model ---------
 model = BCNN(p_conv=0.2, last_layer=last_layer, n_classes=n_classes,
              weights=weights_path
             )
+
 labels = pd.read_csv(labels_path)
+labels.image = labels.image.apply(lambda s: s + ".jpeg")
+labels.level = labels.level.astype(str)
 
 # data is kept in folders with images with correspdonding csv file with labelss
 datagen = ImageDataGenerator(
@@ -54,8 +57,9 @@ generator = datagen.flow_from_dataframe(
     seed=None,
 )
 
+# ---------- Main loop ----------
 n_samples = labels.shape[0]
-n_out = model.net.output_shape
+n_out = model.net.output_shape[1]
 
 det_out = np.zeros((n_samples, n_out), dtype=np.float32)
 stoch_out = np.zeros((n_samples, n_out, mc_samples), dtype=np.float32)
