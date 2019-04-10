@@ -7,14 +7,14 @@ import pandas as pd
 import tensorflow as tf
 from tensorflow.keras import regularizers
 from tensorflow.keras.losses import CategoricalCrossentropy
-from tensorflow.keras.callbacks import CSVLogger, ModelCheckpoint 
+from tensorflow.keras.callbacks import CSVLogger, ModelCheckpoint
 from tensorflow.keras.utils import Progbar
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import os
     os.sys.path.append('.')
 

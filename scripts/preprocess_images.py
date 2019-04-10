@@ -6,7 +6,7 @@ from PIL import Image
 import numpy as np
 import cv2
 
-from fs_utils import collect_images, ensure_directory_exists
+from scripts.fs_utils import collect_images, ensure_directory_exists
 
 # The amount of concurrency available. This should not be set
 # higher than the number of hardware threads available on the

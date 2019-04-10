@@ -1,6 +1,6 @@
 
 import sys
-from fs_utils import collect_images
+from scripts.fs_utils import collect_images
 
 def main(source_dir, target_dir):
     source_filenames = [filename for (filepath, filename) in collect_images(source_dir)]

@@ -34,7 +34,6 @@ def quadratic_weighted_kappa(labels_rater_1, labels_rater_2, num_classes):
     -------
     quadratic_weighted_kappa : scalar, values [-1,1]
     '''
-
     w = np.zeros((num_classes, num_classes))
     e = np.zeros((num_classes, num_classes))
     ob = np.zeros((num_classes, num_classes))
@@ -92,9 +91,7 @@ class Progplot(object):
         self.l = {}
         colors = sns.color_palette(n_colors=len(names)).as_hex()
         for i, k in enumerate(names):
-            self.l[k] = self.p.line(x=[], y=[],
-                                    line_color=colors[i], legend=k,
-                                    line_width=2)
+            self.l[k] = self.p.line(x=[], y=[], line_color=colors[i], legend=k, line_width=2)
         self.curdoc = bp.curdoc()
         # This line is crucial as it adds the necessary on change callbacks:
         self.curdoc.add_root(self.p)
@@ -110,24 +107,21 @@ class Progplot(object):
     def show(self):
         self.session.show()
 
-    def update(self, current, values=[]):
+    def update(self, current_step, values=[]):
         '''
         Parameters
         ----------
-        current: int
+        current_step: int
             index of current step
         values: list of tuples (name, value_for_last_step)
         '''
-
         for k, v in values:
             if k not in self.l.keys():
                 raise KeyError('Name is not known to progplot instance.')
-
-            self.y[k][current] = v
-            self.l[k].data_source.data['x'] = self.x[:current]
-            self.l[k].data_source.data['y'] = self.y[k][:current]
-
-        self.seen_so_far = current
+            self.y[k][current_step] = v
+            self.l[k].data_source.data['x'] = self.x[:current_step]
+            self.l[k].data_source.data['y'] = self.y[k][:current_step]
+        self.seen_so_far = current_step
 
     def add(self, values=[]):
         '''
@@ -191,8 +185,7 @@ class AdaptiveLearningRateScheduler(tf_keras.callbacks.Callback):
                 tf_keras.backend.set_value(self.model.optimizer.lr, self.lr)
                 self.wait = 0
                 if self.verbose > 0:
-                    print('Epoch {}: lower learning rate to {}'
-                          .format(epoch, self.lr))
+                    print('Epoch {}: lower learning rate to {}'.format(epoch, self.lr))
 
 class SelectiveSampler(object):
     '''Selective sampling of informative instances
@@ -200,7 +193,6 @@ class SelectiveSampler(object):
     training using selective data sampling: Application to hemorrhage
     detection in color fundus images"
     '''
-
     def __init__(self, M, y):
         '''
         Parameters
@@ -290,8 +282,7 @@ def roc_curve_plot(y_true, y_score, pos_label=1,
         plot recommendations of British Diabetic Association and NHS
     '''
     assert y_score.ndim == 1, 'y_score should be of shape (n_samples,)'
-    assert len(y_true) == len(y_score), \
-        'y_true and y_score must both be n_samples long'
+    assert len(y_true) == len(y_score), 'y_true and y_score must both be n_samples long'
 
     low, high = bootstrap([y_true, y_score], roc_auc_score, n_resamples=n_bootstrap, alpha=0.05)
 
@@ -303,8 +294,7 @@ def roc_curve_plot(y_true, y_score, pos_label=1,
     fdr, tdr, _ = roc_curve(y_true, y_score, pos_label=pos_label)
     roc_auc = roc_auc_score(y_true, y_score)
 
-    legend = legend_prefix #+ ' (auc:%0.3f; CI:%0.3f-%0.3f)' \
-        # % (roc_auc, low.value, high.value)
+    legend = legend_prefix
     print(legend)
 
     plt.plot(fdr, tdr, color=color, label=legend, linewidth=2)
@@ -351,11 +341,9 @@ def bootstrap(data, fun, n_resamples=10000, alpha=0.05):
     return low, high
 
 def balance_classes(y, data=None):
-    """Balance classes via undersampling"""
-    assert isinstance(data, list), \
-        'data has to be a list.'
-    assert np.array([len(y) == d.shape[0] for d in data]).all(), \
-        'First dimension of data has to match length of y.'
+    '''Balance classes via undersampling'''
+    assert isinstance(data, list), 'data has to be a list.'
+    assert np.array([len(y) == d.shape[0] for d in data]).all(), 'First dimension must match len(y)'
 
     classes = set(y)
     n_classes = len(classes)
