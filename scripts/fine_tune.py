@@ -8,6 +8,7 @@ import tensorflow as tf
 from tensorflow.keras import regularizers
 from tensorflow.keras.losses import CategoricalCrossentropy
 from tensorflow.keras.callbacks import CSVLogger, ModelCheckpoint
+from tensorflow.keras.callbacks import Callback, LearningRateScheduler
 from tensorflow.keras.utils import Progbar
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
@@ -28,7 +29,8 @@ from datasets import DatasetImageDataGenerator
 p = 0.2
 last_layer = 'layer_17d'  # from JFnet
 batch_size = 32
-epochs = 30
+epochs = 5
+train_model = False
 # lr_schedule = {0: 0.005, 1: 0.005, 2: 0.001, 3: 0.001, 4: 0.0005, 5: 0.0001}
 # change_every = 5
 # we don't apply regularization to bias
@@ -36,14 +38,18 @@ l2_lambda = 0.001  # entire network
 l1_lambda = 0.001  # only last layer
 size = 512
 n_classes = 2
-dataset = 'KaggleDR'
+lr_schedule={0: 0.005, 1: 0.005, 2: 0.001, 3: 0.001, 4: 0.0005, 5: 0.0001}
 seed = 1234
 
 train_dir = "../../output/"
-test_dir = "data/KaggleDR/test/"
+test_dir = "../../output_test/"
+save_dir = "../training_output/"
+model_name = "new_bcnn"
 
-previous_weights = None
-
+# None to have new model, without pretraining
+# weights_path = save_dir + "new_bcnn.h5"
+# paper weights
+weights_path = "models/weights_bcnn1_392bea6.h5"
 # --------- Dataset creation ---------
 # parameters for augmenting data
 # Currently need to specify preprocessing function manually
@@ -71,7 +77,7 @@ AUGMENTATION_PARAMS = {'featurewise_center': False,
 
 train_datagen = ImageDataGenerator(**AUGMENTATION_PARAMS)
 
-# Loading
+# Loading data
 def append_ext(f):
     return f + ".jpeg"
 
@@ -79,10 +85,15 @@ def append_ext(f):
 labels = pd.read_csv(train_dir + "trainLabels.csv")
 labels['image'] = labels['image'].apply(append_ext)
 
-# for labels 1 vs 234
-labels = labels[labels.level != 0]
+# for labels 01 - healthy vs 234 - diseased
 labels['level'] = labels['level'].apply(lambda x: 1 if x > 1 else 0)
 labels['level'] = labels['level'].astype(str)
+
+# same preprocessing for test labels
+test_labels = pd.read_csv(test_dir + "testLabels.csv")
+test_labels['image'] = test_labels['image'].apply(append_ext)
+test_labels['level'] = test_labels['level'].apply(lambda x: 1 if x > 1 else 0)
+test_labels['level'] = test_labels['level'].astype(str)
 
 # create dataset using folder directories
 # train feeds into augmenter
@@ -107,25 +118,35 @@ validation_generator = train_datagen.flow_from_dataframe(
     y_col='level',
     target_size=(512, 512),
     batch_size=batch_size,
-    shuffle=True,
+    shuffle=False,
     seed=None,
     save_to_dir=None,
     subset='validation'
+)
+
+# test set
+test_datagen = ImageDataGenerator(
+    preprocessing_function=KaggleDR.standard_normalize,
+)
+
+test_generator = test_datagen.flow_from_dataframe(
+    test_labels,
+    directory=test_dir,
+    x_col='image',
+    y_col='level',
+    target_size=(512, 512),
+    batch_size=batch_size,
+    shuffle=False,
+    seed=None,
 )
 
 # --------- Compiling Model ---------
 # Setup networks
 bcnn = BCNN(p_conv=p, last_layer=last_layer, n_classes=n_classes,
             l1_lambda=l1_lambda, l2_lambda=l2_lambda,
+            weights=weights_path
            )
 model = bcnn.net
-
-
-# create custom metrics (roc_auc)
-# https://stackoverflow.com/questions/41032551/how-to-compute-receiving-operating-characteristic-roc-and-auc-in-keras
-def auroc(y_true, y_pred):
-    return tf.py_function(roc_auc_score, (y_true, y_pred), tf.float32)
-
 
 # TODO: make this work
 def bayes_cross_entropy(y, ce_loss, n_classes):
@@ -153,25 +174,63 @@ def bce_loss(n_classes):
 model.compile(
     tf.keras.optimizers.Adam(), #trying different optimizer!
     loss='categorical_crossentropy',
-    metrics=['acc', auroc]
+    metrics=['acc']
 )
 
 # --------- Training Model ---------
 # Callbacks for training
-callbacks = [
-    ModelCheckpoint("models/new_bcnn.h5", monitor='val_loss', save_best_only=True, save_weights_only=True),
-    CSVLogger("models/new_bccn_training.csv")
-]
+def lr_schedule_fn(epoch, lr):
+    return lr_schedule[epoch]
 
-
-history = model.fit_generator(
-    train_generator,
-    epochs=epochs,
+learning_rate_scheduler = LearningRateScheduler(
+    lr_schedule_fn,
     verbose=1,
-    callbacks=callbacks,
-    validation_data=validation_generator,
-    workers=1,
-    use_multiprocessing=False
 )
 
-pickle.dump(history, open('models/history_new_bcnn.pkl', 'wb'))
+callbacks = [
+    learning_rate_scheduler,
+    ModelCheckpoint(save_dir + model_name + ".h5",
+                    monitor='val_loss',
+                    save_best_only=True,
+                    save_weights_only=True),
+    CSVLogger(save_dir + model_name + "_training.csv"),
+]
+
+if train_model:
+    history = model.fit_generator(
+        train_generator,
+	epochs=epochs,
+	verbose=1,
+	callbacks=callbacks,
+	validation_data=validation_generator,
+	workers=1,
+	use_multiprocessing=False
+    )
+
+    pickle.dump(history, open(save_dir + 'history_new_bcnn.pkl', 'wb'))
+    # load best weights
+    model.load_weights(save_dir + model_name + ".h5")
+
+# Calculate training roc_auc of best model
+train_y_pred = model.predict( #_generator(
+    validation_generator.next(),
+    verbose=1
+)
+# roc_auc takes prob of positive class as input
+train_y_pred = train_y_pred[:, 1]
+train_y_true = validation_generator.classes[:32]
+train_auc_score = roc_auc_score(train_y_true, train_y_pred)
+print(train_y_pred)
+print(train_y_true)
+print("AUC score {:.5f}".format(train_auc_score))
+
+# Calculate train accuracy and roc_auc
+test_y_pred = model.predict_generator(
+    test_generator,
+    verbose=1
+)
+test_y_pred = test_y_pred[:, 1]
+test_y_true = test_generator.classes
+test_auc_score = roc_auc_score(test_y_true, test_y_pred)
+
+print("AUC score {:.5f}".format(test_auc_score))
