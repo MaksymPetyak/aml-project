@@ -8,7 +8,7 @@ import tensorflow as tf
 from tensorflow.keras import regularizers
 from tensorflow.keras.losses import CategoricalCrossentropy
 from tensorflow.keras.callbacks import CSVLogger, ModelCheckpoint
-from tensorflow.keras.callbacks import Callback, LearningRateScheduler 
+from tensorflow.keras.callbacks import Callback, LearningRateScheduler
 from tensorflow.keras.utils import Progbar
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -16,7 +16,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import os
     os.sys.path.append('.')
 
@@ -51,7 +51,11 @@ model_name = "bcnn01vs234"
 # None to have new model, without pretraining
 weights_path = "../training_output/bcnn01vs234.h5"
 # paper weights
+<<<<<<< HEAD
 # weights_path = "models/weights_bcnn1_392bea6.h5" 
+=======
+weights_path = "models/weights_bcnn1_392bea6.h5"
+>>>>>>> 5ce6d2dd8e7afb20ccc87b667e5fd6a669fca520
 # --------- Dataset creation ---------
 # parameters for augmenting data
 # Currently need to specify preprocessing function manually

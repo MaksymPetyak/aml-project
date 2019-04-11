@@ -3,7 +3,6 @@ import pandas as pd
 from PIL import Image
 import click
 
-
 @click.command()
 @click.option('--labels', '-l',
               default='data/kaggle_dr/retinopathy_solution.csv',
@@ -33,7 +32,6 @@ def main(labels, path, extension):
             df.ix[idx, 'width'], df.ix[idx, 'height'] = im.size
 
     df.to_csv(labels.replace('.csv', '_wh.csv'), index=False)
-
 
 if __name__ == '__main__':
     main()

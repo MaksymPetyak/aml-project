@@ -8,3 +8,9 @@ Original code used in paper:
 Paper utilizes a pre-trained model described in this blogpost:
 
 <http://jeffreydf.github.io/diabetic-retinopathy-detection/>
+
+# The Process
+
+Before any training is done, the images are preprocessed as a good heuristic.
+This is effectively like appending an extra layer called "expert advice" behind
+the neural network.
