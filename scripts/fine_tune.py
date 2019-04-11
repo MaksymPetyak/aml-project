@@ -10,6 +10,7 @@ from tensorflow.keras.losses import CategoricalCrossentropy
 from tensorflow.keras.callbacks import CSVLogger, ModelCheckpoint
 from tensorflow.keras.callbacks import Callback, LearningRateScheduler 
 from tensorflow.keras.utils import Progbar
+from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 from sklearn.model_selection import train_test_split
@@ -29,7 +30,8 @@ from datasets import DatasetImageDataGenerator
 p = 0.2
 last_layer = 'layer_17d'  # from JFnet
 batch_size = 32
-epochs = 5
+epochs = 20
+# if want to just test performance set train_model to false
 train_model = False
 # lr_schedule = {0: 0.005, 1: 0.005, 2: 0.001, 3: 0.001, 4: 0.0005, 5: 0.0001}
 # change_every = 5
@@ -38,18 +40,18 @@ l2_lambda = 0.001  # entire network
 l1_lambda = 0.001  # only last layer
 size = 512
 n_classes = 2
-lr_schedule={0: 0.005, 1: 0.005, 2: 0.001, 3: 0.001, 4: 0.0005, 5: 0.0001}
+# lr_schedule={0: 0.005, 1: 0.005, 2: 0.001, 3: 0.001, 4: 0.0005, 5: 0.0001}
 seed = 1234
 
 train_dir = "../../output/"
 test_dir = "../../output_test/"
 save_dir = "../training_output/"
-model_name = "new_bcnn"
+model_name = "bcnn01vs234"
 
 # None to have new model, without pretraining
-# weights_path = save_dir + "new_bcnn.h5"
+weights_path = "../training_output/bcnn01vs234.h5"
 # paper weights
-weights_path = "models/weights_bcnn1_392bea6.h5" 
+# weights_path = "models/weights_bcnn1_392bea6.h5" 
 # --------- Dataset creation ---------
 # parameters for augmenting data
 # Currently need to specify preprocessing function manually
@@ -82,17 +84,14 @@ def append_ext(f):
     return f + ".jpeg"
 
 
-labels = pd.read_csv(train_dir + "trainLabels.csv")
-labels['image'] = labels['image'].apply(append_ext)
+labels = pd.read_csv(train_dir + "trainLabels01vs234.csv")
 
-# for labels 01 - healthy vs 234 - diseased
-labels['level'] = labels['level'].apply(lambda x: 1 if x > 1 else 0)
+labels['image'] = labels['image'].apply(append_ext)
 labels['level'] = labels['level'].astype(str)
 
 # same preprocessing for test labels
-test_labels = pd.read_csv(test_dir + "testLabels.csv")
+test_labels = pd.read_csv(test_dir + "testLabels01vs234.csv")
 test_labels['image'] = test_labels['image'].apply(append_ext)
-test_labels['level'] = test_labels['level'].apply(lambda x: 1 if x > 1 else 0)
 test_labels['level'] = test_labels['level'].astype(str)
 
 # create dataset using folder directories
@@ -172,7 +171,7 @@ def bce_loss(n_classes):
 
 
 model.compile(
-    tf.keras.optimizers.Adam(), #trying different optimizer!
+    tf.keras.optimizers.Adam(lr=1e-6), #trying different optimizer!
     loss='categorical_crossentropy',
     metrics=['acc']
 )
@@ -188,7 +187,7 @@ learning_rate_scheduler = LearningRateScheduler(
 )
 
 callbacks = [
-    learning_rate_scheduler,
+#    learning_rate_scheduler,
     ModelCheckpoint(save_dir + model_name + ".h5", 
                     monitor='val_loss', 
                     save_best_only=True, 
@@ -207,7 +206,9 @@ if train_model:
 	use_multiprocessing=False
     )
 
-    pickle.dump(history, open(save_dir + 'history_new_bcnn.pkl', 'wb'))
+    # store training progress for viz
+    pickle.dump(history.history, open(save_dir + 'history_' + model_name + '.pkl', 'wb'))
+
     # load best weights
     model.load_weights(save_dir + model_name + ".h5")
 
