@@ -51,11 +51,7 @@ model_name = "bcnn01vs234"
 # None to have new model, without pretraining
 weights_path = "../training_output/bcnn01vs234.h5"
 # paper weights
-<<<<<<< HEAD
-# weights_path = "models/weights_bcnn1_392bea6.h5" 
-=======
-weights_path = "models/weights_bcnn1_392bea6.h5"
->>>>>>> 5ce6d2dd8e7afb20ccc87b667e5fd6a669fca520
+
 # --------- Dataset creation ---------
 # parameters for augmenting data
 # Currently need to specify preprocessing function manually
