@@ -70,7 +70,7 @@ def main(model_name):
     input_count = get_model_input_count(model_name)
 
     # Load the dataset labels.
-    labels = pd.read_csv(labels_path)
+    labels = pd.read_csv(get_dataset_labels_path())
     labels.image = labels.image.apply(lambda s: s + '.jpeg')
     labels.level = labels.level.astype(str)
     sample_count = labels.shape[0]
