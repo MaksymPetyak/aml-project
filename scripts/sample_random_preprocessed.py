@@ -1,6 +1,7 @@
 '''
 Samples a random subset of the preprocessed images.
 '''
+import os
 import sys
 import random
 import shutil
@@ -38,6 +39,7 @@ if __name__ == '__main__':
     if len(sys.argv) < 4:
         print('Usage:')
         print('  python sample_random_preprocessed.py <source_dir> <target_dir> <sample_size>')
+        exit()
     source_dir = sys.argv[1]
     target_dir = sys.argv[2]
     sample_size = int(sys.argv[3])
