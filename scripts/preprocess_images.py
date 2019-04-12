@@ -55,7 +55,7 @@ def set_readonly_directories(source, target):
 # target directory and assign the correct extension.
 def build_image_target_path(filename):
     target_filename = ''.join(filename.split('.')[:-1] + ['.jpeg'])
-    return os.path.join(readonly_target_directory, filename)
+    return os.path.join(readonly_target_directory, target_filename)
 
 # This will take a path-filename pair, and write
 # a processed image to our target directory.
