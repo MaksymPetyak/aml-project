@@ -67,16 +67,14 @@ CONFIG = {
     'BCNN_mildDR_Kaggle': dict(
         [('net', 'BCNN'),
          ('dataset', 'Kaggle'),
-         ('predictions', predictions_dir +
-          'full_mc_100_kaggledr_0vs1234_bcnn.pkl'),
+         ('predictions', predictions_dir + 'full_mc_100_kaggledr_0vs1234_bcnn.pkl'),
          ('disease_onset', 1)] + list(
         DATA['KaggleDR'].items())),
 
     'BCNN_moderateDR_Kaggle': dict(
         [('net', 'BCNN'),
          ('dataset', 'Kaggle'),
-         ('predictions', predictions_dir +
-          'full_mc_100_kaggledr_01vs234_bcnn.pkl'),
+         ('predictions', predictions_dir + 'full_mc_100_kaggledr_01vs234_bcnn.pkl'),
          ('disease_onset', 2)] + list(
         DATA['KaggleDR'].items())),
 
@@ -121,7 +119,7 @@ ONSET_TAG = {1: 'mild DR', 2: 'moderate DR'}
 
 # Set nrows to None later!
 # This can limit the amount of data to make plotting faster
-def load_labels(labels_file, nrows=3200):
+def load_labels(labels_file, nrows=9600):
     df_test = pd.read_csv(labels_file, nrows=nrows)
     y_test = df_test.level.values
     return y_test
@@ -302,7 +300,8 @@ def prediction_vs_uncertainty(y, uncertainty, prediction,
         y, (uncertainty, prediction) = balance_classes(y, [uncertainty,
                                                            prediction])
 
-    error = (y != (prediction >= 0.5))
+    error = prediction >= 0.5
+    error = np.not_equal(y, prediction)
 
     plt.suptitle(title)
 

@@ -23,9 +23,9 @@ preprocessing_function = KaggleDR.standard_normalize
 normalization = None
 
 mc_samples = 100
-batch_size = 64
+batch_size = 32
 # can limit to predict the first n_batches
-n_batches = 0
+n_batches = 300
 n_classes = 2
 is_bcnn = False
 last_layer = "layer_17d"
