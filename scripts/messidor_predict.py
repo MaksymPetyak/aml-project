@@ -107,6 +107,8 @@ def main(model_name):
             T=get_monte_carlo_sample_count())
         index += window_size
         progbar.add(window_size)
+        if index == 1186:
+            break
 
     # Write prediction results.
     with open(get_prediction_output_path(), 'wb') as f:
