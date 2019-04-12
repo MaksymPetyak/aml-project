@@ -40,7 +40,7 @@ def get_prediction_output_path():
 def load_model(model_name):
     if model_name == 'BCNN':
         return BCNN(
-            p_conv=get_dropout_probability(),
+            p_conv=get_bcnn_dropout_probability(),
             last_layer=get_bcnn_last_layer_name(),
             n_classes=get_bcnn_class_count(),
             weights=get_bcnn_weights_filepath())
