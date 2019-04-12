@@ -244,17 +244,17 @@ class KaggleDR(Dataset):
 
     @staticmethod
     def standard_normalize(image):
-        """
+        '''
         Normalize image to have zero mean and unit variance.
         Subtracts channel MEAN and divides by channel STD
-        """
-        # channel standard deviations (calculated by team o_O)
-        STD = np.array([70.53946096, 51.71475228, 43.03428563])
-        # channel means (calculated by team o_O)
+        '''
+        # The values here were precomputed by a third party. They are
+        # left as is because the preprocessed datasets are almost identical,
+        # so in the worst case, these are good first approximations of the
+        # true mean and standard deviation anyway.
         MEAN = np.array([108.64628601, 75.86886597, 54.34005737])
-
-        return np.divide(np.subtract(image,
-                                     MEAN[np.newaxis, np.newaxis, :]),
+        STD = np.array([70.53946096, 51.71475228, 43.03428563])
+        return np.divide(np.subtract(image, MEAN[np.newaxis, np.newaxis, :]),
                          STD[np.newaxis, np.newaxis, :])
 
     @staticmethod
@@ -290,21 +290,17 @@ class KaggleDR(Dataset):
 
     @staticmethod
     def contralateral_agreement(df):
-        """Get only the samples for which the contralateral image had been
+        '''Get only the samples for which the contralateral image had been
            assigned the same label
-
         Parameters
         ==========
         df: pandas data frame
             all samples
-
         Returns
         =======
-
         df: pandas data frame
             just the samples with contralateral label agreement
-
-        """
+        '''
 
         left = df.image.str.contains(r'\d+_left')
         right = df.image.str.contains(r'\d+_right')
@@ -316,11 +312,10 @@ class KaggleDR(Dataset):
                                      accepted_images_right))
         return df[df.image.isin(accepted_images)]
 
-
 class Messidor(KaggleDR):
 
     def __init__(self, path_data=None,
-                 filename_targets='data/messidor/messidor.csv',
+                 filename_targets='~/messidor/messidor.csv',
                  preprocessing=KaggleDR.standard_normalize):
         super(Messidor, self).__init__(path_data=path_data,
                                        filename_targets=filename_targets,
@@ -329,52 +324,23 @@ class Messidor(KaggleDR):
 
     @staticmethod
     def prepare_labels():
-        """ Prepare csv labels file from messidor's excel sheets
+        labels_file = '~/messidor/messidor.csv'
+        labels = pd.read_csv(labels_file)
+        assert len(labels) == 1186
 
-        With the resulting labels file, one should be able to use Messidor data
-        the same way as KaggleDR data
-
-        """
-
-        labels_file = 'data/messidor/messidor.csv'
-
-        if os.path.exists(labels_file):
-            print(labels_file, 'already exists.')
-            labels = pd.read_csv(labels_file)
-        else:
-            labels = pd.DataFrame({'image': pd.Series(dtype='str'),
-                                   'level': pd.Series(dtype='int32')})
-            filenames = glob.glob('data/messidor/Annotation*Base*.xls')
-            for fn in filenames:
-                df = pd.read_excel(fn,
-                                   converters={'Retinopathy grade': np.int32})
-                chunk = pd.DataFrame(
-                    {'image': df['Image name'].apply(lambda x:
-                                                     x.split('.tif')[0]),
-                     'level': df['Retinopathy grade']})
-                labels = labels.append(chunk)
-            labels.to_csv(labels_file, index=False)
-
-        assert len(labels) == 1200
-
-        labels_file_R0vsR1 = 'data/messidor/messidor_R0vsR1.csv'
-
+        labels_file_R0vsR1 = '~/messidor/messidor_R0vsR1.csv'
         if os.path.exists(labels_file_R0vsR1):
             print(labels_file_R0vsR1, 'already exists.')
-            labels_ROvsR1 = pd.read_csv(labels_file_R0vsR1)
-
+            labels_R0vsR1 = pd.read_csv(labels_file_R0vsR1)
         else:
-            labels_ROvsR1 = labels[(labels.level == 0) | (labels.level == 1)]
-            labels_ROvsR1.to_csv(labels_file_R0vsR1, index=False)
-
-        assert len(labels_ROvsR1) == 699
-
-        return labels, labels_ROvsR1
+            labels_R0vsR1 = labels[(labels.level == 0) | (labels.level == 1)]
+            labels_R0vsR1.to_csv(labels_file_R0vsR1, index=False)
+        assert len(labels_R0vsR1) > 600
+        return labels, labels_R0vsR1
 
     @staticmethod
     def contralateral_agreement(df):
         raise NotImplementedError('Undefined for Messidor.')
-
 
 class DatasetFromDirectory(Dataset):
     """Works without labels"""
@@ -436,8 +402,7 @@ class DatasetIterator(object):
         self.batch_index = 0
         self.total_batches_seen = 0
         self.lock = threading.Lock()
-        self.index_generator = self._flow_index(indices, batch_size, shuffle,
-                                                seed)
+        self.index_generator = self._flow_index(indices, batch_size, shuffle, seed)
         self.save_to_dir = save_to_dir
         self.save_prefix = save_prefix
         self.save_format = save_format
