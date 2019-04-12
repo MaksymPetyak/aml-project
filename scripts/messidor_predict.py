@@ -45,7 +45,7 @@ def load_model(model_name):
             n_classes=get_bcnn_class_count(),
             weights=get_bcnn_weights_filepath())
     if model_name == 'JFNet':
-        return JFnet(batch_size=get_batch_size())
+        return JFnet()
     raise Exception('Unhandled model')
 
 def get_model_input_count(model_name):
@@ -55,7 +55,7 @@ def get_model_input_count(model_name):
 
 def prepare_input(model_name, X):
     if model_name == 'JFNet':
-        img_dim = np.zeros((get_batch_size(), 2))
+        img_dim = np.zeros((X.shape[0], 2))
         img_dim[:, 0] = 512 # width
         img_dim[:, 1] = 512 # height
         return [X, img_dim]
