@@ -1,3 +1,4 @@
+import sys
 import pickle
 import numpy as np
 import pandas as pd
@@ -5,10 +6,12 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.utils import Progbar
-from datasets import KaggleDR, Messidor
+
 if __name__ == '__main__':
     import os
     os.sys.path.append('.')
+from datasets import KaggleDR, Messidor
+
 from BCNN import BCNN
 from JFnet import JFnet
 
