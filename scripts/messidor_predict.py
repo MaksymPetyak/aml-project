@@ -30,7 +30,7 @@ def get_batch_size():
     return 64
 
 def get_dataset_images_path():
-    return '~/messidor'
+    return '~/messidor/'
 def get_dataset_labels_path():
     return '~/messidor/messidor.csv'
 
