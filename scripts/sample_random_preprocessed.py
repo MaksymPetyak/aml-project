@@ -1,6 +1,7 @@
 '''
 Samples a random subset of the preprocessed images.
 '''
+import sys
 import random
 import shutil
 from scripts.fs_utils import collect_images
