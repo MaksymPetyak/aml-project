@@ -18,8 +18,8 @@ from JFnet import JFnet
 # Configuration
 def get_monte_carlo_sample_count():
     return 100
-def get_bcnn_weights_filepath():
-    return '../training_output/bcnn01vs234.h5'
+def get_bcnn_weights_filepath(weights_type):
+    return '../training_output/bcnn{}.h5'.format(weights_type)
 def get_bcnn_last_layer_name():
     return 'layer_17d'
 def get_bcnn_dropout_probability():
@@ -34,18 +34,18 @@ def get_dataset_images_path():
 def get_dataset_labels_path():
     return '../../messidor/messidor.csv'
 
-def get_prediction_output_path(model_name):
-    return '../predict_output/mc_100_messidor_{}.pkl'.format(model_name.lower())
+def get_prediction_output_path(model_name, weights_type):
+    return '../predict_output/mc_100_messidor_{}_{}.pkl'.format(model_name.lower(), weights_type)
 
-def load_model(model_name):
+def load_model(model_name, weights_type):
     if model_name == 'BCNN':
         return BCNN(
             p_conv=get_bcnn_dropout_probability(),
             last_layer=get_bcnn_last_layer_name(),
             n_classes=get_bcnn_class_count(),
-            weights=get_bcnn_weights_filepath())
+            weights=get_bcnn_weights_filepath(weights_type))
     if model_name == 'JFNet':
-        return JFnet()
+        return JFnet(batch_size=get_batch_size())
     raise Exception('Unhandled model')
 
 def get_model_input_count(model_name):
@@ -64,9 +64,9 @@ def prepare_input(model_name, X):
     raise Exception('Unhandled model')
 
 # Main entry point.
-def main(model_name):
+def main(model_name, weights_type):
     # Load the model.
-    model = load_model(model_name)
+    model = load_model(model_name, weights_type)
     input_count = get_model_input_count(model_name)
 
     # Load the dataset labels.
@@ -107,17 +107,18 @@ def main(model_name):
             T=get_monte_carlo_sample_count())
         index += window_size
         progbar.add(window_size)
-        if index == 1186:
+        if index == 1186 or (index == 1152 and model_name == 'JFNet'):
             break
 
     # Write prediction results.
-    with open(get_prediction_output_path(model_name), 'wb') as f:
+    with open(get_prediction_output_path(model_name, weights_type), 'wb') as f:
         pickle.dump({'det_out': det_out, 'stoch_out': stoch_out}, f)
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 3:
         print('Usage:')
-        print('  python messidor_predict.py (BCNN|JFNet)')
+        print('  python messidor_predict.py (BCNN|JFNet) (0v1234|01v234)')
         exit()
     model_name = sys.argv[1]
-    main(model_name)
+    weights_type = sys.argv[2]
+    main(model_name, weights_type)
