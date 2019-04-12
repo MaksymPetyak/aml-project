@@ -23,25 +23,31 @@ preprocessing_function = KaggleDR.standard_normalize
 normalization = None
 
 mc_samples = 100
-batch_size = 32
+batch_size = 64
 # can limit to predict the first n_batches
-n_batches = 100
+n_batches = 0
 n_classes = 2
-is_bcnn = True
+is_bcnn = False
 last_layer = "layer_17d"
 
+# weights are for BCNN models only
 weights_path = "../training_output/bcnn0vs1234.h5"
+
+# Don't forget to rename out file to avoid overwritting
 dataset_dir = "../../output_test" 
-labels_path = "../../output_test/testLabels0vs1234.csv"
-out_file = "../predict_output/mc_100_kaggledr_0vs1234_bcnn.pkl"
+labels_path = "../../output_test/testLabels.csv"
+out_file = "../predict_output/mc_100_kaggledr_jfnet.pkl"
 
 # --------- Load model ---------
 if is_bcnn:
     model = BCNN(p_conv=0.2, last_layer=last_layer, n_classes=n_classes,
                  weights=weights_path
                 )
+    n_inputs = 1 # necessary for mc_sample dim
 else:
+    # need to specify batchsize for JFnet
     model = JFnet(batch_size=batch_size)
+    n_inputs = 2
 
 labels = pd.read_csv(labels_path)
 labels.image = labels.image.apply(lambda s: s + ".jpeg")
@@ -78,7 +84,7 @@ n_batch = 0
 
 progbar = Progbar(n_samples)
 for X, y in generator:
-    if n_batch >= n_batches:
+    if n_batches and n_batch >= n_batches:
         break
 
     n_s = X.shape[0]
@@ -88,13 +94,17 @@ for X, y in generator:
         break
 
     if isinstance(model, JFnet):
-        img_dim = (512, 512)
+        # JFnet takes image dimension as the second input
+        img_dim = np.zeros((batch_size, 2))
+        img_dim[:, 0] = 512 # width
+        img_dim[:, 1] = 512 # height
         inputs = [X, img_dim]
     else:
-        inputs = [X]
+        inputs = X
 
-    det_out[idx:idx + n_s] = model.predict(*inputs)
-    stoch_out[idx:idx + n_s] = model.mc_samples(*inputs,
+    det_out[idx:idx + n_s] = model.predict(inputs)
+    stoch_out[idx:idx + n_s] = model.mc_samples(inputs,
+                                                n_inputs=n_inputs,
                                                 T=mc_samples)
 
     idx += n_s

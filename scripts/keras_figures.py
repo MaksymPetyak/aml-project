@@ -16,9 +16,9 @@ from util import balance_classes
 
 from matplotlib import rcParams
 
-predictions_dir = "../predict_output"
-train_dir = "../../output"
-test_dir = "../../output_test"
+predictions_dir = "../predict_output/"
+train_dir = "../../output/"
+test_dir = "../../output_test/"
 save_dir = "figures/"
 
 DATA = {
@@ -49,7 +49,7 @@ CONFIG = {
         [('net', 'BCNN'),
          ('dataset', 'Kaggle train'),
          ('predictions', predictions_dir +
-          'mc_100_kaggledr_0vs1234_bcnn.pkl'),
+          'full_mc_100_kaggledr_0vs1234_bcnn.pkl'),
          ('disease_onset', 1)] + list(
         DATA['KaggleDR_train'].items())),
 
@@ -57,7 +57,7 @@ CONFIG = {
         [('net', 'BCNN'),
          ('dataset', 'Kaggle'),
          ('predictions', predictions_dir +
-          'mc_100_kaggledr_0vs1234_bcnn.pkl'),
+          'full_mc_100_kaggledr_0vs1234_bcnn.pkl'),
          ('disease_onset', 1)] + list(
         DATA['KaggleDR'].items())),
 
@@ -65,7 +65,7 @@ CONFIG = {
         [('net', 'BCNN'),
          ('dataset', 'Kaggle'),
          ('predictions', predictions_dir +
-          'mc_100_kaggledr_01vs234_bcnn.pkl'),
+          'full_mc_100_kaggledr_01vs234_bcnn.pkl'),
          ('disease_onset', 2)] + list(
         DATA['KaggleDR'].items())),
 
@@ -465,13 +465,16 @@ def main():
     uncertainties = {'$\sigma_{pred}$': pred_std}
 
     bayes_vs_softmax()
+    print("Figure 2 done")
 
     acc_rejection_figure(
         y_bin, pred_mean, uncertainties, config,
         save=True, format='.png'
     )
+    print("Figure 3 done")
 
     level_figure()
+    print("Figure 6 done")
 
 
 if __name__ == '__main__':
