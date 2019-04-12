@@ -1,3 +1,7 @@
+'''
+Ensures that our long-running processes for preprocessing
+images actually did what they were supposed to do.
+'''
 
 import sys
 from scripts.fs_utils import collect_images

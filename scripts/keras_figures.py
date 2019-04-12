@@ -21,6 +21,8 @@ train_dir = "../../output/"
 test_dir = "../../output_test/"
 save_dir = "figures/"
 
+messidor_dir = '../../messidor/'
+
 DATA = {
     'KaggleDR_train':
         {'LABELS_FILE': train_dir + 'trainLabels.csv',
@@ -42,6 +44,15 @@ DATA = {
                                (4, 'proliferative DR')]),
          'min_percentile': 50,
          'n_bootstrap': 10000},
+    'Messidor':
+        {'LABELS_FILE': messidor_dir + 'messidor.csv',
+         'IMAGE_PATH': messidor_dir,
+         'LEVEL': OrderedDict([(0, 'no DR'),
+                               (1, 'mild non-prolif'),
+                               (2, 'severe non-prolif'),
+                               (3, 'most serious')]),
+         'min_percentile': 50,
+         'n_bootstrap': 1000}
 }
 
 CONFIG = {
@@ -68,6 +79,14 @@ CONFIG = {
           'full_mc_100_kaggledr_01vs234_bcnn.pkl'),
          ('disease_onset', 2)] + list(
         DATA['KaggleDR'].items())),
+
+    'BCNN_moderateDR_Messidor': dict(
+        [('net', 'BCNN'),
+         ('dataset', 'Messidor'),
+         ('predictions', predictions_dir +
+          'mc_100_messidor_bcnn.pkl'),
+         ('disease_onset', 2)] + list(
+        DATA['Messidor'].items())),
 
     'JFnet_mildDR_Kaggle': dict(
         [('net', 'JFnet'),
@@ -410,7 +429,7 @@ def level_subplot(y_level, uncertainty, config,
 
         colors = {level: sns.color_palette("Blues")[level] for level in LEVEL}
         colors[0] = 'white'
-        
+
         for level in LEVEL:
             ax.fill_between(tol, p[level] + cum, cum,
                             color=colors[level],

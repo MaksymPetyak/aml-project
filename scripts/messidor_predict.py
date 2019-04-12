@@ -30,12 +30,12 @@ def get_batch_size():
     return 64
 
 def get_dataset_images_path():
-    return '~/messidor/'
+    return '../../messidor/'
 def get_dataset_labels_path():
-    return '~/messidor/messidor.csv'
+    return '../../messidor/messidor.csv'
 
 def get_prediction_output_path():
-    return '../predict_output/mc_100_messidor_jfnet.pkl'
+    return '../predict_output/mc_100_messidor_bcnn.pkl'
 
 def load_model(model_name):
     if model_name == 'BCNN':
@@ -96,6 +96,8 @@ def main(model_name):
     for X, y in generator:
         window_size = X.shape[0]
         if window_size == 0:
+            break
+        if index >= det_out.shape[0]:
             break
         inputs = prepare_input(model_name, X)
         det_out[index:index + window_size] = model.predict(inputs)
