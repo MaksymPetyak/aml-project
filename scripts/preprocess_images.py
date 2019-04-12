@@ -62,6 +62,7 @@ def build_image_target_path(filename):
 def process_image(source_image):
     source_path, source_filename = source_image[0], source_image[1]
     target_path = build_image_target_path(source_filename)
+    print('Target path: ' + target_path)
     if not os.path.exists(target_path):
         img = convert(source_path, CROP_SIZE)
         if img is not None:
