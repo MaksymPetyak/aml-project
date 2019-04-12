@@ -27,6 +27,7 @@ batch_size = 32
 # can limit to predict the first n_batches
 n_batches = 100
 n_classes = 2
+is_bcnn = True
 last_layer = "layer_17d"
 
 weights_path = "../training_output/bcnn0vs1234.h5"
@@ -35,9 +36,12 @@ labels_path = "../../output_test/testLabels0vs1234.csv"
 out_file = "../predict_output/mc_100_kaggledr_0vs1234_bcnn.pkl"
 
 # --------- Load model ---------
-model = BCNN(p_conv=0.2, last_layer=last_layer, n_classes=n_classes,
-             weights=weights_path
-            )
+if is_bcnn:
+    model = BCNN(p_conv=0.2, last_layer=last_layer, n_classes=n_classes,
+                 weights=weights_path
+                )
+else:
+    model = JFnet(batch_size=batch_size)
 
 labels = pd.read_csv(labels_path)
 labels.image = labels.image.apply(lambda s: s + ".jpeg")
@@ -77,7 +81,11 @@ for X, y in generator:
     if n_batch >= n_batches:
         break
 
-    n_s = X.shape[0]    
+    n_s = X.shape[0]
+
+    # weird bug fix
+    if n_s == 0:
+        break
 
     if isinstance(model, JFnet):
         img_dim = (512, 512)
