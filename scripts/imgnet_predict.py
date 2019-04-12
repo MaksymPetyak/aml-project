@@ -35,7 +35,7 @@ def get_dataset_labels_path():
     return '../../imgnet/imgnet.csv'
 
 def get_prediction_output_path(model_name, weights_type):
-    return '../predict_output/mc_100_messidor_{}_{}.pkl'.format(model_name.lower(), weights_type)
+    return '../predict_output/mc_100_imgnet_{}_{}.pkl'.format(model_name.lower(), weights_type)
 
 def load_model(model_name, weights_type):
     if model_name == 'BCNN':
@@ -71,7 +71,6 @@ def main(model_name, weights_type):
 
     # Load the dataset labels.
     labels = pd.read_csv(get_dataset_labels_path())
-    labels.image = labels.image.apply(lambda s: s + '.jpeg')
     labels.level = labels.level.astype(str)
     sample_count = labels.shape[0]
 
