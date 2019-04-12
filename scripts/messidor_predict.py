@@ -34,8 +34,8 @@ def get_dataset_images_path():
 def get_dataset_labels_path():
     return '../../messidor/messidor.csv'
 
-def get_prediction_output_path():
-    return '../predict_output/mc_100_messidor_bcnn.pkl'
+def get_prediction_output_path(model_name):
+    return '../predict_output/mc_100_messidor_{}.pkl'.format(model_name.lower())
 
 def load_model(model_name):
     if model_name == 'BCNN':
@@ -111,7 +111,7 @@ def main(model_name):
             break
 
     # Write prediction results.
-    with open(get_prediction_output_path(), 'wb') as f:
+    with open(get_prediction_output_path(model_name), 'wb') as f:
         pickle.dump({'det_out': det_out, 'stoch_out': stoch_out}, f)
 
 if __name__ == '__main__':
