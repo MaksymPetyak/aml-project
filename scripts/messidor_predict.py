@@ -107,7 +107,7 @@ def main(model_name, weights_type):
             T=get_monte_carlo_sample_count())
         index += window_size
         progbar.add(window_size)
-        if index == 1186 or (index == 1152 and model_name == 'JFNet'):
+        if index == sample_count:# or (index == 64*(sample_count//64) and model_name == 'JFNet'):
             break
 
     # Write prediction results.
@@ -117,7 +117,7 @@ def main(model_name, weights_type):
 if __name__ == '__main__':
     if len(sys.argv) < 3:
         print('Usage:')
-        print('  python messidor_predict.py (BCNN|JFNet) (0v1234|01v234)')
+        print('  python messidor_predict.py (BCNN|JFNet) (0vs1234|01vs234)')
         exit()
     model_name = sys.argv[1]
     weights_type = sys.argv[2]

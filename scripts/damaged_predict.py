@@ -10,7 +10,7 @@ from tensorflow.keras.utils import Progbar
 if __name__ == '__main__':
     import os
     os.sys.path.append('.')
-from datasets import KaggleDR, Messidor
+from datasets import KaggleDR
 
 from BCNN import BCNN
 from JFnet import JFnet
@@ -30,12 +30,12 @@ def get_batch_size():
     return 64
 
 def get_dataset_images_path():
-    return '../../imgnet/'
+    return '../../damaged/'
 def get_dataset_labels_path():
-    return '../../imgnet/imgnet.csv'
+    return '../../damaged/damaged.csv'
 
 def get_prediction_output_path(model_name, weights_type):
-    return '../predict_output/mc_100_imgnet_{}_{}.pkl'.format(model_name.lower(), weights_type)
+    return '../predict_output/mc_100_damaged_{}_{}.pkl'.format(model_name.lower(), weights_type)
 
 def load_model(model_name, weights_type):
     if model_name == 'BCNN':
@@ -71,6 +71,7 @@ def main(model_name, weights_type):
 
     # Load the dataset labels.
     labels = pd.read_csv(get_dataset_labels_path())
+    labels.image = labels.image.apply(lambda s: s + '.jpeg')
     labels.level = labels.level.astype(str)
     sample_count = labels.shape[0]
 
@@ -116,7 +117,7 @@ def main(model_name, weights_type):
 if __name__ == '__main__':
     if len(sys.argv) < 3:
         print('Usage:')
-        print('  python imgnet_predict.py (BCNN|JFNet) (0vs1234|01vs234)')
+        print('  python damaged_predict.py (BCNN|JFNet) (0vs1234|01vs234)')
         exit()
     model_name = sys.argv[1]
     weights_type = sys.argv[2]
