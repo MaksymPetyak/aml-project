@@ -3,6 +3,9 @@ import pickle
 import os
 import pandas as pd
 import seaborn as sns
+import matplotlib as mpl
+mpl.use('Agg')
+
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
@@ -15,11 +18,11 @@ plt.ion()
 sns.set_context('paper', font_scale=1.5)
 sns.set_style('whitegrid')
 
-path = 'data/processed/'
+path = '../predict_output/'
 
-configs = {1: {'kaggle_out': '100_mc_KaggleDR_test_BayesJFnet17_392bea6.pkl',
-               'imagenet_out': '100_mc_imagenet_val_BayesJFnet17_392bea6.pkl',
-               'messidor_out': '100_mc_Messidor_BayesJFnet17_392bea6.pkl',
+configs = {1: {'kaggle_out': 'mc_100_kaggledr_0vs1234_bcnn.pkl',
+               'imagenet_out': 'mc_100_imgnet_bcnn_0vs1234.pkl',
+               'messidor_out': 'mc_100_messidor_bcnn_0vs1234.pkl',
                'kaggle_feat_train':
                    '0_mc_KaggleDR_train_BayesJFnet17_global_pool_392bea6.pkl',
                'kaggle_feat_test':
@@ -30,11 +33,9 @@ configs = {1: {'kaggle_out': '100_mc_KaggleDR_test_BayesJFnet17_392bea6.pkl',
                    '0_mc_imagenet_val_BayesJFnet17_global_pool_392bea6.pkl',
                'autoencoder': 'ae_1.h5',
                'labels': 'data/kaggle_dr/trainLabels_bin.csv'},
-           2: {'kaggle_out': '100_mc_KaggleDR_test_bcnn2_b69aadd.pkl',
-               'imagenet_out':
-                   '100_mc_imagenet_val_BayesianJFnet17_onset2_b69aadd.pkl',
-               'messidor_out':
-                   '100_mc_Messidor_BayesianJFnet17_onset2_b69aadd.pkl',
+           2: {'kaggle_out': 'mc_100_kaggledr_01vs234_bcnn.pkl',
+               'imagenet_out': 'mc_100_imgnet_bcnn_01vs234.pkl',
+               'messidor_out': ' mc_100_messidor_bcnn_01vs234.pkl',
                'kaggle_feat_train':
                    '0_mc_KaggleDR_train_bcnn2_b69aadd_global_pool.pkl',
                'kaggle_feat_test':
@@ -140,14 +141,14 @@ def anomaly_plot(config):
 
 
 def figure():
-    ax221 = plt.subplot(221)
+    ax221 = plt.subplot(121)
     ax221.set_title('(a) Disease onset: mild DR', loc='left')
     uncertainty_plot(configs[1])
 
-    ax222 = plt.subplot(222)
+    ax222 = plt.subplot(122)
     ax222.set_title('(b) Disease onset: moderate DR', loc='left')
     uncertainty_plot(configs[2])
-
+    '''
     ax223 = plt.subplot(223)
     ax223.set_title('(c) Disease onset: mild DR', loc='left')
     anomaly_plot(configs[1])
@@ -155,7 +156,8 @@ def figure():
     ax224 = plt.subplot(224)
     ax224.set_title('(d) Disease onset: moderate DR', loc='left')
     anomaly_plot(configs[2])
-
+    '''
+    plt.savefig('fig8.png')
 
 if __name__ == '__main__':
     figure()
