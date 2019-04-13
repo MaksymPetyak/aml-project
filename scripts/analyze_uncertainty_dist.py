@@ -12,9 +12,11 @@ def load_stochastic_predictions(filename):
         assert ((0.0 <= probs_mc) & (probs_mc <= 1.0 + 1e-6)).all()
         return probs_mc
 
-def binary_probs(probs):
-    assert probs.shape[1] == 2
-    return np.squeeze(probs[:, 1:])
+def binary_probs(probs, min_positive_level):
+    if probs.shape[1] == 2:
+        return np.squeeze(probs[:, 1:])
+    elif probs.shape[1] == 5:
+        return probs[:, min_positive_level:].sum(axis=1)
 
 def posterior_statistics(probs_mc_bin):
     predictive_mean = probs_mc_bin.mean(axis=1)
@@ -22,9 +24,9 @@ def posterior_statistics(probs_mc_bin):
     assert (0.0 <= predictive_std).all()
     return predictive_mean, predictive_std
 
-def main(pickle_file):
+def main(pickle_file, min_positive_level):
     probs_mc = load_stochastic_predictions(pickle_file)
-    probs_mc_bin = binary_probs(probs_mc)
+    probs_mc_bin = binary_probs(probs_mc, min_positive_level)
     pred_mean, pred_std = posterior_statistics(probs_mc_bin)
     uncertainties = list(pred_std)
     above = dict()
@@ -40,9 +42,10 @@ def main(pickle_file):
         print('%.2f%% are above %.2f' % (100*v/len(uncertainties), k/100.0))
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 3:
         print('Usage:')
-        print('  python analyze_uncertainty_dist.py <predictions.pkl>')
+        print('  python analyze_uncertainty_dist.py <predictions.pkl> <min_positive_level>')
         exit()
     pickle_file = sys.argv[1]
-    main(pickle_file)
+    min_positive_level = int(sys.argv[2])
+    main(pickle_file, min_positive_level)
