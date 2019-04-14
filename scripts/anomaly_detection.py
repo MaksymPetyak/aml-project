@@ -23,6 +23,7 @@ path = '../predict_output/'
 configs = {1: {'kaggle_out': 'mc_100_kaggledr_0vs1234_bcnn.pkl',
                'imagenet_out': 'mc_100_imgnet_bcnn_0vs1234.pkl',
                'messidor_out': 'mc_100_messidor_bcnn_0vs1234.pkl',
+               'damaged_out': 'mc_100_damaged_bcnn_0vs1234.pkl',
                'kaggle_feat_train':
                    '0_mc_KaggleDR_train_BayesJFnet17_global_pool_392bea6.pkl',
                'kaggle_feat_test':
@@ -35,7 +36,8 @@ configs = {1: {'kaggle_out': 'mc_100_kaggledr_0vs1234_bcnn.pkl',
                'labels': 'data/kaggle_dr/trainLabels_bin.csv'},
            2: {'kaggle_out': 'mc_100_kaggledr_01vs234_bcnn.pkl',
                'imagenet_out': 'mc_100_imgnet_bcnn_01vs234.pkl',
-               'messidor_out': ' mc_100_messidor_bcnn_01vs234.pkl',
+               'messidor_out': 'mc_100_messidor_bcnn_01vs234.pkl',
+               'damaged_out': 'mc_100_damaged_bcnn_01vs234.pkl',
                'kaggle_feat_train':
                    '0_mc_KaggleDR_train_bcnn2_b69aadd_global_pool.pkl',
                'kaggle_feat_test':
@@ -56,10 +58,15 @@ def load_uncertainties(config):
         pred_messidor_out = pickle.load(h)
     with open(os.path.join(path, config['imagenet_out']), 'rb') as h:
         pred_imagenet_out = pickle.load(h)
+    with open(os.path.join(path, config['damaged_out']), 'rb') as h:
+        pred_damaged_out = pickle.load(h)
+        
     std_kaggle_out = pred_kaggle_out['stoch_out'].std(axis=-1)[:, 1]
     std_messidor_out = pred_messidor_out['stoch_out'].std(axis=-1)[:, 1]
     std_imagenet_out = pred_imagenet_out['stoch_out'].std(axis=-1)[:, 1]
-    return std_kaggle_out, std_messidor_out, std_imagenet_out
+    std_damaged_out = pred_damaged_out['stoch_out'].std(axis=-1)[:, 1]
+    
+    return std_kaggle_out, std_messidor_out, std_imagenet_out,std_damaged_out
 
 
 def load_features(filename):
@@ -111,11 +118,13 @@ def squared_reconstruction_error(autoencoder, X):
 
 
 def uncertainty_plot(config):
-    std_kaggle_out, std_messidor_out, std_imagenet_out = \
+    std_kaggle_out, std_messidor_out, std_imagenet_out, std_damaged_out = \
         load_uncertainties(config)
     sns.kdeplot(std_kaggle_out, shade=True, cut=3, label='Kaggle')
     sns.kdeplot(std_messidor_out, shade=True, cut=3, label='Messidor')
     sns.kdeplot(std_imagenet_out, shade=True, cut=3, label='Imagenet')
+    sns.kdeplot(std_damaged_out, shade=True, cut=3, label='Damaged')
+    
     plt.xlabel('uncertainty [$\sigma_{pred}$]')
     plt.ylabel('density [a.u.]')
     plt.xlim(0)
