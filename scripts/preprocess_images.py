@@ -5,7 +5,8 @@ import multiprocessing.pool
 from PIL import Image
 import numpy as np
 import cv2
-
+if __name__ == '__main__':
+    os.sys.path.append('.')
 from scripts.fs_utils import collect_images, ensure_directory_exists
 
 # The amount of concurrency available. This should not be set

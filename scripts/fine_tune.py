@@ -79,19 +79,14 @@ AUGMENTATION_PARAMS = {'featurewise_center': False,
 
 train_datagen = ImageDataGenerator(**AUGMENTATION_PARAMS)
 
-# Loading data
-def append_ext(f):
-    return f + ".jpeg"
-
-
 labels = pd.read_csv(train_dir + "trainLabels01vs234.csv")
 
-labels['image'] = labels['image'].apply(append_ext)
+labels['image'] = labels['image'].apply(lambda x: x + '.jpeg')
 labels['level'] = labels['level'].astype(str)
 
 # same preprocessing for test labels
 test_labels = pd.read_csv(test_dir + "testLabels01vs234.csv")
-test_labels['image'] = test_labels['image'].apply(append_ext)
+test_labels['image'] = test_labels['image'].apply(lambda x: x + '.jpeg')
 test_labels['level'] = test_labels['level'].astype(str)
 
 # create dataset using folder directories
@@ -188,9 +183,9 @@ learning_rate_scheduler = LearningRateScheduler(
 
 callbacks = [
 #    learning_rate_scheduler,
-    ModelCheckpoint(save_dir + model_name + ".h5", 
-                    monitor='val_loss', 
-                    save_best_only=True, 
+    ModelCheckpoint(save_dir + model_name + ".h5",
+                    monitor='val_loss',
+                    save_best_only=True,
                     save_weights_only=True),
     CSVLogger(save_dir + model_name + "_training.csv"),
 ]
