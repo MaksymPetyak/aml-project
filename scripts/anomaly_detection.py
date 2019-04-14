@@ -23,7 +23,7 @@ path = '../predict_output/'
 configs = {1: {'kaggle_out': 'mc_100_kaggledr_0vs1234_bcnn.pkl',
                'imagenet_out': 'mc_100_imgnet_bcnn_0vs1234.pkl',
                'messidor_out': 'mc_100_messidor_bcnn_0vs1234.pkl',
-               'damaged_out': 'mc_100_damaed_bcnn_0vs1234.pkl',
+               'damaged_out': 'mc_100_damaged_bcnn_0vs1234.pkl',
                'kaggle_feat_train':
                    '0_mc_KaggleDR_train_BayesJFnet17_global_pool_392bea6.pkl',
                'kaggle_feat_test':
@@ -37,7 +37,7 @@ configs = {1: {'kaggle_out': 'mc_100_kaggledr_0vs1234_bcnn.pkl',
            2: {'kaggle_out': 'mc_100_kaggledr_01vs234_bcnn.pkl',
                'imagenet_out': 'mc_100_imgnet_bcnn_01vs234.pkl',
                'messidor_out': 'mc_100_messidor_bcnn_01vs234.pkl',
-               'damaged_out': 'mc_100_damaed_bcnn_01vs234.pkl',
+               'damaged_out': 'mc_100_damaged_bcnn_01vs234.pkl',
                'kaggle_feat_train':
                    '0_mc_KaggleDR_train_bcnn2_b69aadd_global_pool.pkl',
                'kaggle_feat_test':
