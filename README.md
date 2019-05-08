@@ -9,8 +9,13 @@ Paper utilizes a pre-trained model described in this blogpost:
 
 <http://jeffreydf.github.io/diabetic-retinopathy-detection/>
 
-# The Process
+## Structure
+For an example of how uncertainty is used see [example notebook](/example.ipynb)
 
-Before any training is done, the images are preprocessed as a good heuristic.
-This is effectively like appending an extra layer called "expert advice" behind
-the neural network.
+The models are implemented using Keras and Python 3, for more details see [BCNN model](BCNN.py) and [JFNet model](JFNet.py)
+
+The data is ommitted as it is too large to store on github, but the model weights are stored in "models" directory.
+
+## Poster
+
+![poster](poster.pdf)
